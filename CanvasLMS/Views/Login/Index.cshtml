@@ -28,6 +28,7 @@
                 @* Display validation errors at the top of the form *@
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="d-flex justify-content-end">
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-secondary me-3">Back</a>
                     <button class="btn btn-primary" type="submit">Login</button>
                 </div>
             }
