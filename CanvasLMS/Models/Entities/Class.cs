@@ -15,8 +15,8 @@ namespace CanvasLMS.Models.Entities
         public string ClassTitle { get; set; }
         public DateTime ClassDate { get; set; }
 
-        public CourseCycle CourseCycle { get; set; }
-        public Professor Professor { get; set; }
-        public List<Attendance> Attendance { get; set; }
+        public CourseCycle? CourseCycle { get; set; }
+        public Professor? Professor { get; set; }
+        public List<Attendance>? Attendance { get; set; }
     }
 }

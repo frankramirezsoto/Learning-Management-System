@@ -9,7 +9,7 @@ namespace CanvasLMS.Models.Entities
         public string Name { get; set; }
         public string? Description { get; set; }
 
-        public List<Cycle> Cycles { get; } = [];
-        public List<Career> Careers { get; } = [];
+        public List<Cycle>? Cycles { get; } = [];
+        public List<Career>? Careers { get; } = [];
     }
 }

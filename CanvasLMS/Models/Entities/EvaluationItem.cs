@@ -11,11 +11,12 @@ namespace CanvasLMS.Models.Entities
 
         public string Name { get; set; }
         public string? Description { get; set; }
-        [Precision(3,2)]
+        [Precision(10,2)]
         public decimal Percentage { get; set; }
         public bool IsGroupal { get; set; }
 
-        public CourseCycle CourseCycle { get; set; }
-        public List<Score> Scores { get; set; }
+        public CourseCycle? CourseCycle { get; set; }
+        public List<Score>? Scores { get; set; }
+        public List<EvaluationTask>? Tasks { get; set; }
     }
 }

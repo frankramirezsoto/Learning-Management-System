@@ -70,8 +70,7 @@ namespace CanvasLMS.Migrations
                 name: "Professors",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -86,8 +85,7 @@ namespace CanvasLMS.Migrations
                 name: "Students",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -138,7 +136,8 @@ namespace CanvasLMS.Migrations
                     DayOfWeek = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TimeOfDay = table.Column<TimeSpan>(type: "time", nullable: false),
                     maxQuota = table.Column<int>(type: "int", nullable: false),
-                    MeetingUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    MeetingUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -187,6 +186,54 @@ namespace CanvasLMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CareerStudent",
+                columns: table => new
+                {
+                    CareersId = table.Column<int>(type: "int", nullable: false),
+                    StudentsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CareerStudent", x => new { x.CareersId, x.StudentsId });
+                    table.ForeignKey(
+                        name: "FK_CareerStudent_Careers_CareersId",
+                        column: x => x.CareersId,
+                        principalTable: "Careers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CareerStudent_Students_StudentsId",
+                        column: x => x.StudentsId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProfessorCareer",
+                columns: table => new
+                {
+                    CareersId = table.Column<int>(type: "int", nullable: false),
+                    ProfessorsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfessorCareer", x => new { x.CareersId, x.ProfessorsId });
+                    table.ForeignKey(
+                        name: "FK_ProfessorCareer_Careers_CareersId",
+                        column: x => x.CareersId,
+                        principalTable: "Careers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProfessorCareer_Professors_ProfessorsId",
+                        column: x => x.ProfessorsId,
+                        principalTable: "Professors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Classes",
                 columns: table => new
                 {
@@ -219,11 +266,7 @@ namespace CanvasLMS.Migrations
                 {
                     CourseCycleId = table.Column<int>(type: "int", nullable: false),
                     StudentId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsCancelled = table.Column<bool>(type: "bit", nullable: true),
-                    CancelReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CourseCompleted = table.Column<bool>(type: "bit", nullable: false),
-                    FinalScore = table.Column<decimal>(type: "decimal(3,2)", precision: 3, scale: 2, nullable: false)
+                    FinalScore = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -251,7 +294,7 @@ namespace CanvasLMS.Migrations
                     CourseCycleId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Percentage = table.Column<decimal>(type: "decimal(3,2)", precision: 3, scale: 2, nullable: false),
+                    Percentage = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     IsGroupal = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -277,6 +320,25 @@ namespace CanvasLMS.Migrations
                     table.PrimaryKey("PK_Groups", x => new { x.Id, x.CourseCycleId });
                     table.ForeignKey(
                         name: "FK_Groups_CourseCycles_CourseCycleId",
+                        column: x => x.CourseCycleId,
+                        principalTable: "CourseCycles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Modules",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    CourseCycleId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Modules", x => new { x.Id, x.CourseCycleId });
+                    table.ForeignKey(
+                        name: "FK_Modules_CourseCycles_CourseCycleId",
                         column: x => x.CourseCycleId,
                         principalTable: "CourseCycles",
                         principalColumn: "Id",
@@ -310,26 +372,22 @@ namespace CanvasLMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Scores",
+                name: "EvaluationTasks",
                 columns: table => new
                 {
-                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EvaluationItemId = table.Column<int>(type: "int", nullable: false),
-                    ScorePercentage = table.Column<decimal>(type: "decimal(3,2)", precision: 3, scale: 2, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Scores", x => new { x.StudentId, x.EvaluationItemId });
+                    table.PrimaryKey("PK_EvaluationTasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Scores_EvaluationItems_EvaluationItemId",
+                        name: "FK_EvaluationTasks_EvaluationItems_EvaluationItemId",
                         column: x => x.EvaluationItemId,
                         principalTable: "EvaluationItems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Scores_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -354,6 +412,87 @@ namespace CanvasLMS.Migrations
                     table.ForeignKey(
                         name: "FK_GroupStudent_Students_StudentsId",
                         column: x => x.StudentsId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModulePaths",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ModuleId = table.Column<int>(type: "int", nullable: false),
+                    CourseCycleId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModulePaths", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModulePaths_Modules_ModuleId_CourseCycleId",
+                        columns: x => new { x.ModuleId, x.CourseCycleId },
+                        principalTable: "Modules",
+                        principalColumns: new[] { "Id", "CourseCycleId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Scores",
+                columns: table => new
+                {
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    EvaluationTaskId = table.Column<int>(type: "int", nullable: false),
+                    ScorePercentage = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    EvaluationItemId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Scores", x => new { x.StudentId, x.EvaluationTaskId });
+                    table.ForeignKey(
+                        name: "FK_Scores_EvaluationItems_EvaluationItemId",
+                        column: x => x.EvaluationItemId,
+                        principalTable: "EvaluationItems",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Scores_EvaluationTasks_EvaluationTaskId",
+                        column: x => x.EvaluationTaskId,
+                        principalTable: "EvaluationTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Scores_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TaskSubmissions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EvaluationTaskId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Score = table.Column<decimal>(type: "decimal(3,2)", precision: 3, scale: 2, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TaskSubmissions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TaskSubmissions_EvaluationTasks_EvaluationTaskId",
+                        column: x => x.EvaluationTaskId,
+                        principalTable: "EvaluationTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TaskSubmissions_Students_StudentId",
+                        column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -386,7 +525,12 @@ namespace CanvasLMS.Migrations
             migrationBuilder.InsertData(
                 table: "Professors",
                 columns: new[] { "Id", "Email", "FirstName", "LastName", "Password" },
-                values: new object[] { 1001, "framirezs869@ulacit.ed.cr", "Frank", "Ramirez", "Admin123!" });
+                values: new object[] { 166666666, "framirezs869@ulacit.ed.cr", "Frank", "Ramirez", "Admin123!" });
+
+            migrationBuilder.InsertData(
+                table: "Students",
+                columns: new[] { "Id", "Email", "FirstName", "LastName", "Password" },
+                values: new object[] { 116800869, "josue.ramirez@ulacit.ed.cr", "Josue", "Ramirez", "Ulacit123!" });
 
             migrationBuilder.InsertData(
                 table: "Careers",
@@ -404,6 +548,15 @@ namespace CanvasLMS.Migrations
                 {
                     { 101, "165003" },
                     { 101, "169005" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ProfessorCareer",
+                columns: new[] { "CareersId", "ProfessorsId" },
+                values: new object[,]
+                {
+                    { 101, 166666666 },
+                    { 102, 166666666 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -425,6 +578,11 @@ namespace CanvasLMS.Migrations
                 name: "IX_Careers_FacultyId",
                 table: "Careers",
                 column: "FacultyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CareerStudent_StudentsId",
+                table: "CareerStudent",
+                column: "StudentsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_CourseCycleId",
@@ -462,6 +620,11 @@ namespace CanvasLMS.Migrations
                 column: "CourseCycleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EvaluationTasks_EvaluationItemId",
+                table: "EvaluationTasks",
+                column: "EvaluationItemId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Groups_CourseCycleId",
                 table: "Groups",
                 column: "CourseCycleId");
@@ -470,6 +633,21 @@ namespace CanvasLMS.Migrations
                 name: "IX_GroupStudent_GroupsId_GroupsCourseCycleId",
                 table: "GroupStudent",
                 columns: new[] { "GroupsId", "GroupsCourseCycleId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModulePaths_ModuleId_CourseCycleId",
+                table: "ModulePaths",
+                columns: new[] { "ModuleId", "CourseCycleId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Modules_CourseCycleId",
+                table: "Modules",
+                column: "CourseCycleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfessorCareer_ProfessorsId",
+                table: "ProfessorCareer",
+                column: "ProfessorsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Professors_Email",
@@ -482,9 +660,24 @@ namespace CanvasLMS.Migrations
                 column: "EvaluationItemId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Scores_EvaluationTaskId",
+                table: "Scores",
+                column: "EvaluationTaskId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_Email",
                 table: "Students",
                 column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskSubmissions_EvaluationTaskId",
+                table: "TaskSubmissions",
+                column: "EvaluationTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskSubmissions_StudentId",
+                table: "TaskSubmissions",
+                column: "StudentId");
         }
 
         /// <inheritdoc />
@@ -497,25 +690,40 @@ namespace CanvasLMS.Migrations
                 name: "CareerCourse");
 
             migrationBuilder.DropTable(
+                name: "CareerStudent");
+
+            migrationBuilder.DropTable(
                 name: "Enrollments");
 
             migrationBuilder.DropTable(
                 name: "GroupStudent");
 
             migrationBuilder.DropTable(
+                name: "ModulePaths");
+
+            migrationBuilder.DropTable(
+                name: "ProfessorCareer");
+
+            migrationBuilder.DropTable(
                 name: "Scores");
+
+            migrationBuilder.DropTable(
+                name: "TaskSubmissions");
 
             migrationBuilder.DropTable(
                 name: "Classes");
 
             migrationBuilder.DropTable(
-                name: "Careers");
-
-            migrationBuilder.DropTable(
                 name: "Groups");
 
             migrationBuilder.DropTable(
-                name: "EvaluationItems");
+                name: "Modules");
+
+            migrationBuilder.DropTable(
+                name: "Careers");
+
+            migrationBuilder.DropTable(
+                name: "EvaluationTasks");
 
             migrationBuilder.DropTable(
                 name: "Students");
@@ -525,6 +733,9 @@ namespace CanvasLMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Faculties");
+
+            migrationBuilder.DropTable(
+                name: "EvaluationItems");
 
             migrationBuilder.DropTable(
                 name: "CourseCycles");

@@ -13,7 +13,7 @@ namespace CanvasLMS.Models.Entities
 
         public string Status { get; set; }
 
-        public Class Class { get; set; }
-        public Student Student { get; set; }
+        public Class? Class { get; set; }
+        public Student? Student { get; set; }
     }
 }

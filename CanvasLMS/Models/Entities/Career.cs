@@ -10,9 +10,10 @@ namespace CanvasLMS.Models.Entities
         public int AcademicLevelId { get; set; }
         public int FacultyId { get; set; }
 
-        public List<Course> Courses { get; } = [];
-        public AcademicLevel AcademicLevel { get; set; }
-        public Faculty Faculty { get; set; }
-
+        public List<Course>? Courses { get; } = [];
+        public AcademicLevel? AcademicLevel { get; set; }
+        public Faculty? Faculty { get; set; }
+        public List<Professor>? Professors { get; } = [];
+        public List<Student>? Students { get; } = [];
     }
 }

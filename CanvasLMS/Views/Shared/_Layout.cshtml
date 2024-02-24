@@ -15,9 +15,22 @@
 
 </head>
 <body id="body-pd">
+    <!-- Toast for Notifications -->
+    <div id="position" class="toast-container text-white p-3 d-none" style="position: fixed;z-index: 2000;">
+        <div id="notificationToast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <span id="toastMessage"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <!-- Header -->
     <header class="header" id="header">
         <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
     </header>
+    <!-- NavBar -->
     <div class="l-navbar" id="nav-bar">
         <nav class="nav">
             <div>
@@ -29,13 +42,13 @@
                         <i class='bx bxs-user-circle nav_icon'></i>
                         <span class="nav_name">Account</span> 
                     </a> 
-                    <a href="#" class="nav_link text-white">
+                    <a href="@Url.Content("~/CourseCycle")" class="nav_link text-white">
                         <i class='bx bxs-book nav_icon'></i>
                         <span class="nav_name">Courses</span> 
                     </a> 
                 </div>
             </div> 
-            <a href="#" class="nav_link text-white"> 
+            <a asp-action="SignOut" asp-controller="Login" class="nav_link text-white">
                 <i class='bx bx-log-out nav_icon'></i> 
                 <span class="nav_name">Sign Out</span> 
             </a>
@@ -48,20 +61,48 @@
         </main>
     </div>
 
-    <main role="main" class="pb-3">
-            @RenderBody()
-    </main>
-
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - CanvasLMS - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - Canvas - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/sidebar.js"></script>
+    <script>
+        //Function to show an alert
+        function displayToast(message, background) {
+            var toastContainer = document.getElementById('notificationToast');
+            var toastMessage = document.getElementById('toastMessage');
+            var position = document.getElementById('position');
 
+            //Set the position
+            //Position is added here because if added when initialized the exit button shows static on startup
+            position.classList.remove('d-none')
+            position.classList.add('top-0', 'end-0')
+            // Set the message content
+            toastMessage.innerHTML = message;
+            toastContainer.classList.remove(...toastContainer.classList);
+            toastContainer.classList.add('toast', `bg-${background}`);
+
+            // Create a new Toast instance and show it
+            var toast = new bootstrap.Toast(toastContainer);
+            toast.show();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const showToast = urlParams.get('showToast');
+        switch (showToast) {
+            case "courseCycleAdded":
+                displayToast("Course added successfully.", "success")
+                break;
+            case "studentEnrolled":
+                displayToast("Student enrolled successfully.", "success")
+                break;
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

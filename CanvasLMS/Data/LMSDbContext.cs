@@ -1,6 +1,7 @@
 ﻿using CanvasLMS.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Hosting;
 
 namespace CanvasLMS.Data
@@ -15,12 +16,12 @@ namespace CanvasLMS.Data
 
             //Adding Identity Specification 
             modelBuilder.Entity<Professor>()
-            .HasKey(x => x.Id)
-            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .Property(e => e.Id)
+                .ValueGeneratedNever(); // Turns off identity specification for Professor
 
             modelBuilder.Entity<Student>()
-            .HasKey(x => x.Id)
-            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .Property(e => e.Id)
+                .ValueGeneratedNever(); // Turns off identity for Student
 
             modelBuilder.Entity<AcademicLevel>()
             .HasKey(x => x.Id)
@@ -31,6 +32,25 @@ namespace CanvasLMS.Data
             .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity<Career>()
+            .HasKey(x => x.Id)
+            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity<CourseCycle>()
+            .HasKey(x => x.Id)
+            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity<EvaluationItem>()
+            .HasKey(x => x.Id)
+            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity<EvaluationTask>()
+            .HasKey(x => x.Id)
+            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity<ModulePath>()
+            .HasKey(x => x.Id)
+            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+            modelBuilder.Entity<TaskSubmission>()
             .HasKey(x => x.Id)
             .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -51,15 +71,31 @@ namespace CanvasLMS.Data
             .WithMany(e => e.Attendance)
             .HasForeignKey(r => new { r.ClassId, r.CourseCycleId });
 
+            //Setting Relationship for the ModulePath Entity with the Module
+            modelBuilder.Entity<ModulePath>()
+            .HasOne(e => e.Module)
+            .WithMany(e => e.ModulePaths)
+            .HasForeignKey(r => new { r.ModuleId, r.CourseCycleId });
+
             //Seeding Database with Data
             //Professor User
             modelBuilder.Entity<Professor>().HasData(new Professor
             {
-                Id = 1001,
+                Id = 166666666,
                 FirstName = "Frank",
                 LastName = "Ramirez",
                 Email = "framirezs869@ulacit.ed.cr",
                 Password = "Admin123!",
+            });
+
+            //Student User
+            modelBuilder.Entity<Student>().HasData(new Student
+            {
+                Id = 116800869,
+                FirstName = "Josue",
+                LastName = "Ramirez",
+                Email = "josue.ramirez@ulacit.ed.cr",
+                Password = "Ulacit123!",
             });
 
             //Adding Faculties
@@ -125,6 +161,15 @@ namespace CanvasLMS.Data
                                new { CareersId = 101, CoursesId = "169005" },
                                new { CareersId = 101, CoursesId = "165003" }
             ));
+            //Adding Professor Career
+            modelBuilder.Entity<Career>()
+            .HasMany(s => s.Professors)
+            .WithMany(c => c.Careers)
+            .UsingEntity(j => j.ToTable("ProfessorCareer")
+                           .HasData(
+                               new { ProfessorsId = 166666666, CareersId = 101 },
+                               new { ProfessorsId = 166666666, CareersId = 102 }
+            ));
         }
 
         public DbSet<Professor> Professors { get; set; }
@@ -141,5 +186,9 @@ namespace CanvasLMS.Data
         public DbSet<EvaluationItem> EvaluationItems { get; set; }
         public DbSet<Score> Scores { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<Module> Modules { get; set; }
+        public DbSet<ModulePath> ModulePaths { get; set; }
+        public DbSet<EvaluationTask> EvaluationTasks { get; set; }
+        public DbSet<TaskSubmission> TaskSubmissions { get; set; }
     }
 }

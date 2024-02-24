@@ -13,7 +13,8 @@ namespace CanvasLMS.Models.Entities
         public string Email { get; set; }
         public string Password { get; set; }
 
-        public List<CourseCycle> CourseCycles { get; } = [];
-        public List<Class> Classes { get; set; }
+        public List<CourseCycle>? CourseCycles { get; } = [];
+        public List<Class>? Classes { get; set; }
+        public List<Career>? Careers { get; } = [];
     }
 }

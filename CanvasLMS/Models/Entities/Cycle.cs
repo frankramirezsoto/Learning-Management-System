@@ -9,6 +9,6 @@ namespace CanvasLMS.Models.Entities
         public DateTime EndDate { get; set; }
         public bool isCurrentCycle { get; set; }
 
-        public List<Course> Courses { get; } = [];
+        public List<Course>? Courses { get; } = [];
     }
 }
