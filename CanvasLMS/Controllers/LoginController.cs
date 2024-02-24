@@ -1,4 +1,5 @@
-﻿using CanvasLMS.Extensions;
+﻿using CanvasLMS.Attributes;
+using CanvasLMS.Extensions;
 using CanvasLMS.Models.Entities;
 using CanvasLMS.Models.ViewModels;
 using CanvasLMS.Repositories.Contracts;
@@ -8,6 +9,7 @@ namespace CanvasLMS.Controllers
 {
     public class LoginController : Controller
     {
+        //Uses Professor and Student Repositories
         private readonly IProfessorRepository _professorRepository;
         private readonly IStudentRepository _studentRepository;
 
@@ -16,7 +18,7 @@ namespace CanvasLMS.Controllers
             _professorRepository = professorRepository;
             _studentRepository = studentRepository;
         }
-
+        [RedirectLogged]
         [HttpGet]
         public IActionResult Index()
         {
@@ -31,18 +33,23 @@ namespace CanvasLMS.Controllers
                 var professor = await _professorRepository.GetByEmailAsync(model.Email);
                 var student = await _studentRepository.GetByEmailAsync(model.Email);
 
+                //Verifies if the user logging is a Professor or a Student and sets the Session to an Object variable 
+                //There are 2 Sessions, one for Student and one for Professor 
+                //The SessionViewModel is used to store the current user's Id and Name 
+
                 if (professor != null && VerifyPassword(model.Password, professor.Password))
                 {
-
-                    HttpContext.Session.SetObject("Professor", professor);
+                    var session = new SessionViewModel { UserId = professor.Id, UserName = $"{professor.FirstName} {professor.LastName}" };
+                    HttpContext.Session.SetObject("Professor", session);
                     // Redirect to Dashboard
-                    return RedirectToAction("Dashboard", "Home");
+                    return RedirectToAction("Index", "CourseCycle");
                 }
                 else if (student != null && VerifyPassword(model.Password, student.Password))
                 {
-                    HttpContext.Session.SetObject("Student", student);
+                    var session = new SessionViewModel { UserId = student.Id, UserName = $"{student.FirstName} {student.LastName}" };
+                    HttpContext.Session.SetObject("Student", session);
                     // Redirect to Dashboard
-                    return RedirectToAction("Dashboard", "Home");
+                    return RedirectToAction("Index", "CourseCycle");
                 }
                 else
                 {
@@ -57,6 +64,14 @@ namespace CanvasLMS.Controllers
         {
             return enteredPassword == storedPassword;
         }
-    }
+        [HttpGet]
+        public async Task<IActionResult> SignOut() 
+        {
+            // Clear the user's session data
+            HttpContext.Session.Remove("Professor");
+            HttpContext.Session.Remove("Student");
 
+            return RedirectToAction("Index", "Home");
+        }
+    }
 }

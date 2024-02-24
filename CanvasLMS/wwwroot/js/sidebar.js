@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (toggle && nav && bodypd && headerpd) {
             toggle.addEventListener('click', () => {
                 // show navbar
-                nav.classList.toggle('show')
+                nav.classList.toggle('shownav')
                 // change icon
                 toggle.classList.toggle('bx-x')
                 // add padding to body
@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     function colorLink() {
         if (linkColor) {
-            linkColor.forEach(l => l.classList.remove('active'))
-            this.classList.add('active')
+            linkColor.forEach(l => l.classList.remove('activenav'))
+            this.classList.add('activenav')
         }
     }
     linkColor.forEach(l => l.addEventListener('click', colorLink))

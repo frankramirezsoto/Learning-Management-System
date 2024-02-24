@@ -1,0 +1,23 @@
+﻿@using CanvasLMS.Utilities
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var color = ViewData["CourseColor"] as string;
+    var name = ViewData["CourseName"] as string;
+    string textColor = ColorUtility.GetContrastTextColor(color);
+    string darkerColor = ColorUtility.DarkenColor(color, 0.6);
+}
+<style>
+    .text-color {
+        color: @textColor;
+    }
+
+    .bg-dynamic {
+        background-color: @color;
+        background: linear-gradient(347deg, @color 20%, @darkerColor 80%);
+    }
+</style>
+<div class="col-12 d-flex justify-content-center justify-content-md-end align-items-center mb-3 bg-dynamic">
+    <h1 class="pe-md-5 text-color my-5">@name</h1>
+</div>

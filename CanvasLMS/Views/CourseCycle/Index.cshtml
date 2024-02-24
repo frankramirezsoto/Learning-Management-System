@@ -1,0 +1,287 @@
+﻿@using CanvasLMS.Utilities
+@model List<CanvasLMS.Models.ViewModels.CourseCycleViewModel>
+
+@{
+    ViewData["Title"] = "Courses";
+    var professor = ViewBag.Professor;
+    var student = ViewBag.Student;
+}
+<style>
+    .section_our_solution .row {
+  align-items: center;
+}
+
+.our_solution_category {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.our_solution_category .solution_cards_box {
+  display: flex;
+  justify-content: center;
+}
+.solution_cards_box .solution_card {
+  flex: 0 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px 0 rgba(136, 144, 195, 0.2),
+    0 5px 15px 0 rgba(37, 44, 97, 0.15);
+  border-radius: 15px;
+  margin: 8px;
+  padding: 10px 15px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  transition: 0.7s;
+}
+
+.solution_cards_box .solution_card:hover {
+  background: #309df0;
+  color: #fff;
+  transform: scale(1.1);
+  z-index: 9;
+}
+
+.solution_cards_box .solution_card:hover::before {
+  background: rgb(85 108 214 / 10%);
+}
+
+.solution_cards_box .solution_card:before {
+  content: "";
+  position: absolute;
+  background: rgb(85 108 214 / 5%);
+  width: 170px;
+  height: 400px;
+  z-index: -1;
+  transform: rotate(42deg);
+  right: -56px;
+  top: -23px;
+  border-radius: 35px;
+}
+
+.solution_cards_box .solution_card:hover .solu_description button {
+  background: #fff !important;
+  color: #309df0;
+}
+
+.solution_card .so_top_icon {
+}
+
+.solution_card .solu_title h3 {
+  font-size: 1.3rem;
+  margin-top: 13px;
+  margin-bottom: 13px;
+}
+
+.solution_card .solu_description p {
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+.solution_card .solu_description button {
+  border: 0;
+  border-radius: 15px;
+  background: linear-gradient(
+    140deg,
+    #42c3ca 0%,
+    #42c3ca 50%,
+    #42c3cac7 75%
+  ) !important;
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 5px 16px;
+}
+
+.our_solution_content h1 {
+  text-transform: capitalize;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+}
+.our_solution_content p {
+}
+
+.hover_color_bubble {
+  position: absolute;
+  background: rgb(54 81 207 / 15%);
+  width: 100rem;
+  height: 100rem;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  top: 16rem;
+  border-radius: 50%;
+  transform: rotate(-36deg);
+  left: -18rem;
+  transition: 0.7s;
+}
+
+.solution_cards_box .solution_card:hover .hover_color_bubble {
+  top: 0rem;
+}
+
+.solution_cards_box .solution_card .so_top_icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solution_cards_box .solution_card .so_top_icon img {
+  width: 40px;
+  height: 50px;
+  object-fit: contain;
+}
+
+/*start media query*/
+@@media screen and (min-width: 320px) {
+  .sol_card_top_3 {
+    position: relative;
+    top: 0;
+  }
+
+  .our_solution_category {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .our_solution_category .solution_cards_box {
+    flex: auto;
+  }
+}
+@@media only screen and (min-width: 768px) {
+  .our_solution_category .solution_cards_box {
+    flex: 1;
+  }
+}
+@@media only screen and (min-width: 1024px) {
+  .sol_card_top_3 {
+    position: relative;
+    top: -3rem;
+  }
+  .our_solution_category {
+    width: 50%;
+    margin: 0 auto;
+  }
+}
+</style>
+<!-- Modal -->
+<div class="modal fade" id="addCourseCycle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("_Create", new CanvasLMS.Models.ViewModels.CourseCycleViewModel(), ViewData)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between my-3 pt-3">
+    <div>
+        <h2>My Courses</h2>
+    </div>
+
+    @if (professor != null)
+    {
+        <div>
+            <a data-bs-toggle="modal" data-bs-target="#addCourseCycle" class="icon icon-fill rounded d-flex align-items-center justify-content-center"><i class='bx bx-plus fs-1 my-auto' style="color:#b44fd1"></i></a>
+        </div>
+    }
+</div>
+
+<div class="solution_cards_box row">
+    @if (Model.Any())
+    {
+        @foreach (var courseCycle in Model)
+        {
+            var courseCycleCode = $"{courseCycle.CycleId}-{courseCycle.CourseId}-G{courseCycle.GroupNo}";
+            var colorTransparent = $"{courseCycle.Color}30";
+            string textColor = ColorUtility.GetContrastTextColor(courseCycle.Color);
+
+            <a href="@Url.Content($"~/CourseCycle/Course/{courseCycle.Id}")" class="col-12 col-sm-6 col-lg-4 col-xl-3 text-decoration-none">
+                <div class="solution_card p-3" style="background: @colorTransparent" onmouseover="this.style.background='@courseCycle.Color';this.style.color='@textColor'" onmouseout="this.style.background='@colorTransparent';this.style.color='black'">
+                    <div class="hover_color_bubble"></div>
+                    <div class="solu_title">
+                        <h3 style="font-size: 1rem">@courseCycleCode</h3>
+                        <h3 style="min-height:70px">@courseCycle.Course.Name</h3>
+                    </div>
+                    <div class="solu_description">
+                        <p> @courseCycle.DayOfWeek - @courseCycle.TimeOfDay</p>
+                    </div>
+                </div>
+            </a>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#careerDropdown').change(function () {
+                var careerId = $(this).val();
+
+                // AJAX call to get courses
+                $.ajax({
+                    type: 'POST',
+                    url: '/CourseCycle/GetCoursesByCareerId',
+                    data: { careerId: careerId },
+                    success: function (data) {
+                        $('#courseDropdown').empty();
+                        $.each(data, function (i, item) {
+                            $('#courseDropdown').append($('<option>', {
+                                value: item.value,
+                                text: item.text
+                            }));
+                        });
+                    }
+                });
+
+                // AJAX call to get professors
+                $.ajax({
+                    type: 'POST',
+                    url: '/CourseCycle/GetProfessorsByCareerId',
+                    data: { careerId: careerId },
+                    success: function (data) {
+                        $('#professorDropdown').empty();
+                        $.each(data, function (i, item) {
+                            $('#professorDropdown').append($('<option>', {
+                                value: item.value,
+                                text: item.text
+                            }));
+                        });
+                    }
+                });
+            });
+            //Function to post the Course Cycle
+            $('#courseCycleForm').submit(function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var formData = $(this).serialize(); // Serialize the form data
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/CourseCycle/Create', 
+                    data: formData,
+                    success: function (response) {
+                        if (response === '200') {
+                            window.location.href = 'CourseCycle/Index?showToast=courseCycleAdded'
+                        } else {
+                            displayToast(response,'danger');
+                        }
+                    },
+                    error: function () {
+                        displayToast('Error occurred during the request.','danger');
+                    }
+                });
+            });
+
+        });
+    </script>
+}

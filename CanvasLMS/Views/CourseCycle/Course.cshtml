@@ -1,0 +1,36 @@
+﻿@model CanvasLMS.Models.ViewModels.CourseCycleViewModel
+@{
+    ViewData["Title"] = $"{Model.Course.Name}";
+    var professor = ViewBag.Professor;
+    var student = ViewBag.Student;
+    //ViewData used by the banner partial View
+    ViewData["CourseColor"] = Model.Color;
+    ViewData["CourseName"] = Model.Course.Name;
+}
+
+<div class="row">
+
+    @await Html.PartialAsync("_Banner",ViewData)
+
+    <div class="col-12 col-lg-1 d-flex justify-content-center align-items-start">
+        @if (student != null)
+        {
+            @await Html.PartialAsync("_NavBarStudent")    
+        } else if (professor !=null)
+        {
+            @await Html.PartialAsync("_NavBarProfessor")
+        }
+    </div>
+
+    <div class="col row">
+        <div class="col-12 px-5">
+            <p class="fw-bold text-muted">@Model.CycleId - @Model.CourseId - Group @Model.GroupNo</p>
+            <p><span class="fw-bold">Professor:</span> @Model.Professor.FirstName @Model.Professor.LastName</p>
+            <p><span class="fw-bold">Schedule:</span> @Model.DayOfWeek - @Model.TimeOfDay</p>
+            <p>@Model.Course.Description</p>
+        </div>
+        <div class="col-12 d-flex justify-content-center">
+            <a href="@Model.MeetingUrl" class="btn btn-lg btn-primary rounded-pill py-3 px-4">Go to the Meeting</a>
+        </div>
+    </div>
+</div>

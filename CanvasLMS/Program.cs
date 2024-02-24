@@ -16,6 +16,10 @@ builder.Services.AddDbContextPool<LMSDbContext>(options =>
 builder.Services.AddScoped(typeof(IUserRepository<>), typeof(UserRepository<>));
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<ICareerRepository, CareerRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICourseCycleRepository, CourseCycleRepository>();
+builder.Services.AddScoped<ICycleRepository, CycleRepository>();
 
 builder.Services.AddSession(options =>
 {

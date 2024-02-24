@@ -159,7 +159,8 @@ namespace CanvasLMS.Data
             .UsingEntity(j => j.ToTable("CareerCourse")
                            .HasData(
                                new { CareersId = 101, CoursesId = "169005" },
-                               new { CareersId = 101, CoursesId = "165003" }
+                               new { CareersId = 101, CoursesId = "165003" },
+                               new { CareersId = 102, CoursesId = "169005" }
             ));
             //Adding Professor Career
             modelBuilder.Entity<Career>()

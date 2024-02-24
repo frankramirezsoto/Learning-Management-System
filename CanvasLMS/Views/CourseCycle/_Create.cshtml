@@ -1,0 +1,74 @@
+﻿@model CanvasLMS.Models.ViewModels.CourseCycleViewModel
+@{
+    // Create a list of SelectListItem for days of the week
+    var daysOfWeek = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Mondays", Text = "Mondays" },
+            new SelectListItem { Value = "Tuesdays", Text = "Tuesdays" },
+            new SelectListItem { Value = "Wednesdays", Text = "Wednesdays" },
+            new SelectListItem { Value = "Thursdays", Text = "Thursdays" },
+            new SelectListItem { Value = "Fridays", Text = "Fridays" },
+            new SelectListItem { Value = "Saturdays", Text = "Saturdays" },
+            new SelectListItem { Value = "Sundays", Text = "Sundays" }
+        };
+}
+
+<div class="p-3">
+    <div class="text-center mb-3">
+        <h4>Add a New Course Cycle</h4>
+    </div>
+    @using (Html.BeginForm("Create", "CourseCycle", FormMethod.Post, new { id = "courseCycleForm" }))
+    {
+        <div class="form-group mb-3">
+            <label asp-for="Color" class="control-label mb-3"></label>
+            <input type="color" id="colorPicker" name="Color" class="form-control w-25" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="careerDropdown" class="control-label mb-3">Career</label>
+            @Html.DropDownList("CareerDropdown", ViewData["Careers"] as SelectList, "Select Career", new { @class = "form-control", id = "careerDropdown" })
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="CourseId" class="control-label mb-3">Course</label>
+            @Html.DropDownListFor(model => model.CourseId, ViewData["Courses"] as SelectList, "Select Course", new { @class = "form-control", id = "courseDropdown" })
+            @Html.ValidationMessageFor(model => model.CourseId)
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="ProfessorId" class="control-label mb-3">Professor</label>
+            @Html.DropDownListFor(model => model.ProfessorId, ViewData["Professors"] as SelectList, "Select Professor", new { @class = "form-control", id = "professorDropdown" })
+            @Html.ValidationMessageFor(model => model.ProfessorId)
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="DayOfWeek" class="control-label mb-3">Day</label>
+            @Html.DropDownListFor(model => model.DayOfWeek, new SelectList(daysOfWeek, "Value", "Text"), new { @class = "form-control" } )
+            @Html.ValidationMessageFor(model => model.DayOfWeek)
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="TimeOfDay" class="control-label mb-3">Time</label>
+            <input type="time" id="timePicker" name="TimeOfDay" class="form-control" />
+            @Html.ValidationMessageFor(model => model.TimeOfDay)
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="maxQuota" class="control-label mb-3">Maximum Amount of Students</label>
+            @Html.EditorFor(model => model.maxQuota, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.maxQuota)
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="MeetingUrl" class="control-label mb-3">Meeting URL (optional)</label>
+            @Html.EditorFor(model => model.MeetingUrl, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.MeetingUrl)
+        </div>
+        <div class="form-group mb-3">
+            <button type="submit" class="btn btn-primary">Create Course</button>
+        </div>
+
+    }
+</div>
+
+
