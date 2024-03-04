@@ -51,7 +51,7 @@ namespace CanvasLMS.Repositories
             {
                 _dbContext.Groups.Update(group);
                 await _dbContext.SaveChangesAsync();
-                return (true, "Group updated successfully.");
+                return (true, "200");
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ namespace CanvasLMS.Repositories
                 {
                     _dbContext.Groups.Remove(group);
                     await _dbContext.SaveChangesAsync();
-                    return (true, "Group deleted successfully.");
+                    return (true, "200");
                 }
                 else
                 {

@@ -206,22 +206,47 @@ namespace CanvasLMS.Controllers
                 ObjectMapper.MapProperties(group, groupDTO);
                 groupList.Add(groupDTO);
             }
+            //A list of students will be passed to the ViewData for the dropdown with available students to be populated
+            List<StudentViewModel> studentsList = new List<StudentViewModel>();
+            
             //A list of enrollments is sent so the Partial View _CreateGroup can be populated with the available Students
             var enrollments = await _enrollmentRepository.GetAllByCourseCycleIdAsync(id);
-            //Convert List to StudentViewModel
-            List<StudentViewModel> studentsList = new List<StudentViewModel>();
-            foreach (var student in students)
+            if (enrollments != null) 
             {
-                var studentDTO = new StudentViewModel();
-                ObjectMapper.MapProperties(student, studentDTO);
-                studentsList.Add(studentDTO);
+                foreach (var enrollment in enrollments)
+                {
+                    var studentDTO = new StudentViewModel();
+                    ObjectMapper.MapProperties(enrollment.Student, studentDTO);
+                    studentsList.Add(studentDTO);
+                }
             }
 
             var studentsSelectList = new SelectList(studentsList, "Id", "IdFullName");
 
             ViewData["Students"] = studentsSelectList;
 
-            return View(enrollmentsList);
+            return View(groupList);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateGroup(GroupViewModel model) 
+        {
+            if(ModelState.IsValid)
+            {
+                var existingGroups = await _groupRepository.GetAllByCourseCycleIdAsync(model.CourseCycleId);
+                var groupCount = 0;
+                if (existingGroups != null)
+                {
+                    groupCount = existingGroups.Count();
+                }
+                var groupDTO = new Group { Id=groupCount+1, CourseCycleId=model.CourseCycleId };
+                (bool Success, string Message) addGroup = await _groupRepository.AddAsync(groupDTO);
+
+                return Content(addGroup.Message);
+            }
+
+            return Content("There was an issue creating the group");
+        }
+
     }
 }

@@ -4,7 +4,7 @@ namespace CanvasLMS.Models.ViewModels
 {
     public class GroupViewModel
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public int CourseCycleId { get; set; }
 
         public CourseCycle? CourseCycle { get; set; }
