@@ -1,0 +1,24 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_LayoutNone.cshtml";
+}
+
+<main class="vh-100" style="background-image: url(@Url.Content("~/assets/images/HomeBackground.jpg"));background-position:center">
+    <div>
+        <img class="p-4" src="@Url.Content("~/assets/images/logo-white.png")" />
+    </div>
+    <div class="h-75 d-flex align-items-center justify-content-center">
+        <div class="text-center col col-sm-8 col-md-6 col-lg-4 bg-white p-5">
+            <div class=" mt-5">
+                <p class="fs-3"> <span class="text-danger">It looks like you don't have enough permission to perform this action.</span></p>
+                <p class="lead">
+                    Click below to go back!
+                </p>
+                <a href="@Url.Content("~/Home/Dashboard")" class="btn btn-primary">Go Home</a>
+            </div>
+
+        </div>
+    </div>
+</main>

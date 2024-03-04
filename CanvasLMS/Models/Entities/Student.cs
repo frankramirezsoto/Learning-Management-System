@@ -15,7 +15,6 @@ namespace CanvasLMS.Models.Entities
 
         public List<Attendance>? Attendance { get; set; }
         public List<Enrollment>? Enrollments { get; set; }
-        public List<Score>? Scores { get; set; }
         public List<Group>? Groups { get; set; }
         public List<TaskSubmission>? Submissions { get; set; }
         public List<Career>? Careers { get; set; }

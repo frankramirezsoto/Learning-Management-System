@@ -47,7 +47,7 @@ namespace CanvasLMS.Data
             .HasKey(x => x.Id)
             .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity<ModulePath>()
+            modelBuilder.Entity<ClassPath>()
             .HasKey(x => x.Id)
             .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
             modelBuilder.Entity<TaskSubmission>()
@@ -72,10 +72,10 @@ namespace CanvasLMS.Data
             .HasForeignKey(r => new { r.ClassId, r.CourseCycleId });
 
             //Setting Relationship for the ModulePath Entity with the Module
-            modelBuilder.Entity<ModulePath>()
-            .HasOne(e => e.Module)
-            .WithMany(e => e.ModulePaths)
-            .HasForeignKey(r => new { r.ModuleId, r.CourseCycleId });
+            modelBuilder.Entity<ClassPath>()
+            .HasOne(e => e.Class)
+            .WithMany(e => e.FilePaths)
+            .HasForeignKey(r => new { r.ClassId, r.CourseCycleId });
 
             //Seeding Database with Data
             //Professor User
@@ -159,8 +159,7 @@ namespace CanvasLMS.Data
             .UsingEntity(j => j.ToTable("CareerCourse")
                            .HasData(
                                new { CareersId = 101, CoursesId = "169005" },
-                               new { CareersId = 101, CoursesId = "165003" },
-                               new { CareersId = 102, CoursesId = "169005" }
+                               new { CareersId = 101, CoursesId = "165003" }
             ));
             //Adding Professor Career
             modelBuilder.Entity<Career>()
@@ -185,10 +184,8 @@ namespace CanvasLMS.Data
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<EvaluationItem> EvaluationItems { get; set; }
-        public DbSet<Score> Scores { get; set; }
         public DbSet<Group> Groups { get; set; }
-        public DbSet<Module> Modules { get; set; }
-        public DbSet<ModulePath> ModulePaths { get; set; }
+        public DbSet<ClassPath> ClassPaths { get; set; }
         public DbSet<EvaluationTask> EvaluationTasks { get; set; }
         public DbSet<TaskSubmission> TaskSubmissions { get; set; }
     }

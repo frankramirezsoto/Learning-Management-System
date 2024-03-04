@@ -24,6 +24,11 @@ namespace CanvasLMS.Repositories
         {
             return await _dbContext.Set<TEntity>().FirstOrDefaultAsync(e => EF.Property<string>(e, "Email") == email);
         }
+        //Method to get all users
+        public async Task<IEnumerable<TEntity>>? GetAllAsync()
+        {
+            return await _dbContext.Set<TEntity>().ToListAsync();
+        }
         //Method to authenticate
         public async Task<bool> AuthenticateAsync(string email, string password)
         {
@@ -33,6 +38,7 @@ namespace CanvasLMS.Repositories
 
             return entity != null;
         }
+        //CRUD Methods
         public async Task<(bool Success, string Message)> AddAsync(TEntity entity)
         {
             try

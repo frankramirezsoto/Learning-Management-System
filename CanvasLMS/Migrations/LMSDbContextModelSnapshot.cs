@@ -140,6 +140,35 @@ namespace CanvasLMS.Migrations
                     b.ToTable("Classes");
                 });
 
+            modelBuilder.Entity("CanvasLMS.Models.Entities.ClassPath", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CourseCycleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.HasIndex("ClassId", "CourseCycleId");
+
+                    b.ToTable("ClassPaths");
+                });
+
             modelBuilder.Entity("CanvasLMS.Models.Entities.Course", b =>
                 {
                     b.Property<string>("Id")
@@ -317,9 +346,19 @@ namespace CanvasLMS.Migrations
                     b.Property<int>("EvaluationItemId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Points")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("Published")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -369,53 +408,6 @@ namespace CanvasLMS.Migrations
                     b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("CanvasLMS.Models.Entities.Module", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CourseCycleId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id", "CourseCycleId");
-
-                    b.HasIndex("CourseCycleId");
-
-                    b.ToTable("Modules");
-                });
-
-            modelBuilder.Entity("CanvasLMS.Models.Entities.ModulePath", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseCycleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ModuleId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.HasIndex("ModuleId", "CourseCycleId");
-
-                    b.ToTable("ModulePaths");
-                });
-
             modelBuilder.Entity("CanvasLMS.Models.Entities.Professor", b =>
                 {
                     b.Property<int>("Id")
@@ -452,30 +444,6 @@ namespace CanvasLMS.Migrations
                             LastName = "Ramirez",
                             Password = "Admin123!"
                         });
-                });
-
-            modelBuilder.Entity("CanvasLMS.Models.Entities.Score", b =>
-                {
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EvaluationTaskId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EvaluationItemId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ScorePercentage")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.HasKey("StudentId", "EvaluationTaskId");
-
-                    b.HasIndex("EvaluationItemId");
-
-                    b.HasIndex("EvaluationTaskId");
-
-                    b.ToTable("Scores");
                 });
 
             modelBuilder.Entity("CanvasLMS.Models.Entities.Student", b =>
@@ -532,11 +500,14 @@ namespace CanvasLMS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Score")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("decimal(3,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmissionDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -572,11 +543,6 @@ namespace CanvasLMS.Migrations
                         {
                             CareersId = 101,
                             CoursesId = "165003"
-                        },
-                        new
-                        {
-                            CareersId = 102,
-                            CoursesId = "169005"
                         });
                 });
 
@@ -697,6 +663,17 @@ namespace CanvasLMS.Migrations
                     b.Navigation("Professor");
                 });
 
+            modelBuilder.Entity("CanvasLMS.Models.Entities.ClassPath", b =>
+                {
+                    b.HasOne("CanvasLMS.Models.Entities.Class", "Class")
+                        .WithMany("FilePaths")
+                        .HasForeignKey("ClassId", "CourseCycleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+                });
+
             modelBuilder.Entity("CanvasLMS.Models.Entities.CourseCycle", b =>
                 {
                     b.HasOne("CanvasLMS.Models.Entities.Course", "Course")
@@ -772,51 +749,6 @@ namespace CanvasLMS.Migrations
                         .IsRequired();
 
                     b.Navigation("CourseCycle");
-                });
-
-            modelBuilder.Entity("CanvasLMS.Models.Entities.Module", b =>
-                {
-                    b.HasOne("CanvasLMS.Models.Entities.CourseCycle", "CourseCycle")
-                        .WithMany()
-                        .HasForeignKey("CourseCycleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CourseCycle");
-                });
-
-            modelBuilder.Entity("CanvasLMS.Models.Entities.ModulePath", b =>
-                {
-                    b.HasOne("CanvasLMS.Models.Entities.Module", "Module")
-                        .WithMany("ModulePaths")
-                        .HasForeignKey("ModuleId", "CourseCycleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Module");
-                });
-
-            modelBuilder.Entity("CanvasLMS.Models.Entities.Score", b =>
-                {
-                    b.HasOne("CanvasLMS.Models.Entities.EvaluationItem", null)
-                        .WithMany("Scores")
-                        .HasForeignKey("EvaluationItemId");
-
-                    b.HasOne("CanvasLMS.Models.Entities.EvaluationTask", "EvaluationTask")
-                        .WithMany()
-                        .HasForeignKey("EvaluationTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CanvasLMS.Models.Entities.Student", "Student")
-                        .WithMany("Scores")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EvaluationTask");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("CanvasLMS.Models.Entities.TaskSubmission", b =>
@@ -901,6 +833,8 @@ namespace CanvasLMS.Migrations
             modelBuilder.Entity("CanvasLMS.Models.Entities.Class", b =>
                 {
                     b.Navigation("Attendance");
+
+                    b.Navigation("FilePaths");
                 });
 
             modelBuilder.Entity("CanvasLMS.Models.Entities.CourseCycle", b =>
@@ -916,19 +850,12 @@ namespace CanvasLMS.Migrations
 
             modelBuilder.Entity("CanvasLMS.Models.Entities.EvaluationItem", b =>
                 {
-                    b.Navigation("Scores");
-
                     b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("CanvasLMS.Models.Entities.EvaluationTask", b =>
                 {
                     b.Navigation("Submissions");
-                });
-
-            modelBuilder.Entity("CanvasLMS.Models.Entities.Module", b =>
-                {
-                    b.Navigation("ModulePaths");
                 });
 
             modelBuilder.Entity("CanvasLMS.Models.Entities.Professor", b =>
@@ -943,8 +870,6 @@ namespace CanvasLMS.Migrations
                     b.Navigation("Attendance");
 
                     b.Navigation("Enrollments");
-
-                    b.Navigation("Scores");
 
                     b.Navigation("Submissions");
                 });

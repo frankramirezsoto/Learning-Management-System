@@ -8,7 +8,8 @@ namespace CanvasLMS.Models.Entities
         public int EvaluationTaskId { get; set; }
         public int StudentId { get; set; }
         public string FilePath { get; set; }
-        [Precision(3, 2)]
+        public DateTime SubmissionDate { get; set; }
+        [Precision(10, 2)]
         public decimal? Score { get; set; }
 
         public EvaluationTask? EvaluationTask { get; set; }

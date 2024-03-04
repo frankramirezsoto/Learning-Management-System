@@ -18,5 +18,6 @@ namespace CanvasLMS.Models.Entities
         public CourseCycle? CourseCycle { get; set; }
         public Professor? Professor { get; set; }
         public List<Attendance>? Attendance { get; set; }
+        public List<ClassPath>? FilePaths { get; set; }
     }
 }

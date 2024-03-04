@@ -12,22 +12,22 @@ using Microsoft.EntityFrameworkCore;
 namespace CanvasLMS.Controllers
 {
     [RequireSession]
-    public class CourseCycleController : Controller
+    public class CourseCycleController : MainCourseCycleController
     {
-        private readonly ICourseCycleRepository _courseCycleRepository;
         private readonly ICourseRepository _courseRepository;
         private readonly ICareerRepository _careerRepository;
         private readonly IProfessorRepository _professorRepository;
         private readonly ICycleRepository _cycleRepository;
+        private readonly IGroupRepository _groupRepository;
 
-        public CourseCycleController(ICourseCycleRepository courseCycleRepository, ICourseRepository courseRepository, 
-            ICareerRepository careerRepository, IProfessorRepository professorRepository, ICycleRepository cycleRepository) 
+        public CourseCycleController(IEnrollmentRepository enrollmentRepository, IStudentRepository studentRepository, ICourseCycleRepository courseCycleRepository, ICourseRepository courseRepository, 
+            ICareerRepository careerRepository, IProfessorRepository professorRepository, ICycleRepository cycleRepository, IGroupRepository groupRepository) : base(enrollmentRepository,studentRepository,courseCycleRepository)
         { 
-            _courseCycleRepository = courseCycleRepository;
             _courseRepository = courseRepository;
             _careerRepository = careerRepository;
             _professorRepository = professorRepository;
             _cycleRepository = cycleRepository;
+            _groupRepository = groupRepository;
         }
 
         [HttpGet]
@@ -69,6 +69,22 @@ namespace CanvasLMS.Controllers
         // GET: CourseCycles/Course/5
         public async Task<IActionResult> Course(int id)
         {
+            //Gets the session to be passed to the View and handle the permissions on this view
+            var professorSession = HttpContext.Session.GetObject<SessionViewModel>("Professor");
+            var studentSession = HttpContext.Session.GetObject<SessionViewModel>("Student");
+            if (studentSession != null)
+            {
+                //Checks with the parent Controller function that the Student is part of the screen being requested 
+                var studentIsInCourse = await StudentIsInCourse(id);
+                if (!studentIsInCourse)
+                {
+                    return RedirectToAction("NotAuthorized", "Home");
+                }
+            }
+
+            ViewBag.Professor = professorSession;
+            ViewBag.Student = studentSession;
+            ViewData["CourseCycleId"] = id; //Used to pass ViewData to NavBar Partial Views
             var courseCycle = await _courseCycleRepository.GetByIdAsync(id);
 
             if (courseCycle == null)
@@ -78,14 +94,6 @@ namespace CanvasLMS.Controllers
 
             var coursecycleDTO = new CourseCycleViewModel();
             ObjectMapper.MapProperties(courseCycle, coursecycleDTO);
-
-            //Gets the session to be passed to the View and handle the permissions on this view
-            var professorSession = HttpContext.Session.GetObject<SessionViewModel>("Professor");
-            var studentSession = HttpContext.Session.GetObject<SessionViewModel>("Student");
-
-            ViewBag.Professor = professorSession;
-            ViewBag.Student = studentSession;
-            ViewData["CourseCycleId"] = id; //Used to pass ViewData to NavBar Partial Views
 
             return View(coursecycleDTO);
         }

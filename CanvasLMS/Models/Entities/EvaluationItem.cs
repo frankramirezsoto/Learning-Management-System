@@ -16,7 +16,6 @@ namespace CanvasLMS.Models.Entities
         public bool IsGroupal { get; set; }
 
         public CourseCycle? CourseCycle { get; set; }
-        public List<Score>? Scores { get; set; }
         public List<EvaluationTask>? Tasks { get; set; }
     }
 }

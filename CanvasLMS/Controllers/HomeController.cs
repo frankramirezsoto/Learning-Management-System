@@ -13,7 +13,7 @@ namespace CanvasLMS.Controllers
         {
             _logger = logger;
         }
-
+        [RedirectLogged]
         public IActionResult Index()
         {
             return View();
@@ -25,6 +25,10 @@ namespace CanvasLMS.Controllers
         }
         [RequireSession]
         public IActionResult Dashboard()
+        {
+            return View();
+        }
+        public IActionResult NotAuthorized() 
         {
             return View();
         }

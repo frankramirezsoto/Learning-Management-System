@@ -63,7 +63,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - Canvas - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - CanvasLMS - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -100,6 +100,18 @@
                 break;
             case "studentEnrolled":
                 displayToast("Student enrolled successfully.", "success")
+                break;
+            case "enrollmentDeleted":
+                displayToast("Enrollment deleted successfully.", "success")
+                break;
+            case "evaluationItemCreated":
+                displayToast("Evaluation Item added successfully.", "success")
+                break;
+            case "evaluationItemUpdated":
+                displayToast("Evaluation Item updated successfully.", "success")
+                break;
+            case "evaluationDeleted":
+                displayToast("Evaluation Item deleted successfully.", "success")
                 break;
         }
     </script>

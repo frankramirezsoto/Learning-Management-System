@@ -1,0 +1,60 @@
+﻿@model CanvasLMS.Models.ViewModels.EnrollmentViewModel
+@{
+    var students = ViewData["Students"] as SelectList;
+    var courseCycleId = ViewData["CourseCycleId"] as int?;
+}
+
+<div class="p-3">
+    <div class="text-center mb-3">
+        <h4>Enroll a Student</h4>
+    </div>
+    @using (Html.BeginForm("CreateEnrollment", "Enrollment", FormMethod.Post, new { id = "enrollmentForm" }))
+    {
+        <div class="row">
+            @* Values required by the model *@
+            <input id="CourseCycleId" name="CourseCycleId" type="hidden" value="@courseCycleId"> 
+            <input id="Student_Password" name="Student.Password" type="hidden" value="temp">
+
+            @Html.HiddenFor(model => model.CourseCycleId, new { value = courseCycleId })
+            @Html.HiddenFor(model => model.Student.Password, new { value = "temp" })
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label for="studentDropdown" class="control-label mb-3">Student</label>
+                    @Html.DropDownList("StudentDropdown", students, "Select Student", new { @class = "form-control", id = "studentDropdown" })
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label asp-for="Student.Id" class="control-label mb-3">Identification</label>
+                    @Html.EditorFor(model => model.Student.Id, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group mb-3">
+                    <label asp-for="Student.FirstName" class="control-label mb-3">First Name</label>
+                    @Html.EditorFor(model => model.Student.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="form-group mb-3">
+                    <label asp-for="Student.LastName" class="control-label mb-3">Last Name</label>
+                    @Html.EditorFor(model => model.Student.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label asp-for="Student.Email" class="control-label mb-3">Student's Email</label>
+                    @Html.EditorFor(model => model.Student.Email, new { htmlAttributes = new { @class = "form-control"} })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            <button type="submit" class="btn btn-primary">Enroll Student</button>
+        </div>
+    }
+</div>
