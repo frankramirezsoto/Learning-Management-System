@@ -22,6 +22,7 @@ builder.Services.AddScoped<ICourseCycleRepository, CourseCycleRepository>();
 builder.Services.AddScoped<ICycleRepository, CycleRepository>();
 builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IEvaluationItemRepository, EvaluationItemRepository>();
 
 builder.Services.AddSession(options =>
 {

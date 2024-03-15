@@ -105,7 +105,7 @@
                                         }
                                     </div>
                                     <div>
-                                        <table class="table">
+                                        <table class="table table-hover">
                                             <thead>
                                                 <tr>
                                                     <th>Name</th>
@@ -173,7 +173,9 @@
                 },
                 success: function (response) {
                     if (response === '200') {
-                        location.href = window.location.href + '?showToast=groupDeleted';
+                        window.location.href = window.location.href.includes('?')
+                            ? window.location.href + '&showToast=groupDeleted'
+                            : window.location.href + '?showToast=groupDeleted';
                     } else {
                         showToast(response, "success");
                     }
@@ -216,7 +218,9 @@
                     data: { CourseCycleId: @ViewData["CourseCycleId"] }, // Pass the course cycle ID
                     success: function (response) {
                         if (response === '200') {
-                            location.href = window.location.href + '?showToast=groupAdded';
+                            window.location.href = window.location.href.includes('?')
+                                ? window.location.href + '&showToast=groupAdded'
+                                : window.location.href + '?showToast=groupAdded';
                         } else {
                             showToast(response, "success");
                         }
@@ -286,7 +290,9 @@
                     success: function (response) {
                         if (response === '200') {
                             // Handle success
-                            location.href = window.location.href + '?showToast=groupUpdated';
+                            window.location.href = window.location.href.includes('?')
+                                ? window.location.href + '&showToast=groupUpdated'
+                                : window.location.href + '?showToast=groupUpdated';
                         } else {
                             // Handle error
                             showToast(response, "danger");

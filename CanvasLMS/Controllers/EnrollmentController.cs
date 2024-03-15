@@ -176,15 +176,15 @@ namespace CanvasLMS.Controllers
             //Gets the session to be passed to the View and handle the permissions on this view
             var professorSession = HttpContext.Session.GetObject<SessionViewModel>("Professor");
             var studentSession = HttpContext.Session.GetObject<SessionViewModel>("Student");
-            //if (studentSession != null)
-            //{
-            //    //Checks with the parent Controller function that the Student is part of the screen being requested 
-            //    var studentIsInCourse = await StudentIsInCourse(id);
-            //    if (!studentIsInCourse)
-            //    {
-            //        return RedirectToAction("NotAuthorized", "Home");
-            //    }
-            //}
+            if (studentSession != null)
+            {
+                //Checks with the parent Controller function that the Student is part of the screen being requested 
+                var studentIsInCourse = await StudentIsInCourse(id);
+                if (!studentIsInCourse)
+                {
+                    return RedirectToAction("NotAuthorized", "Home");
+                }
+            }
 
             ViewBag.Professor = professorSession;
             ViewBag.Student = studentSession;
