@@ -1,0 +1,40 @@
+﻿@{
+    var students = ViewData["Students"] as SelectList;
+    var courseCycleId = ViewData["CourseCycleId"] as int?;
+}
+
+<div class="p-3">
+    <div class="text-center mb-3">
+        <h4>Edit Group</h4>
+    </div>
+    <div class="mb-3">
+        <h3>Group </h3>
+    </div>
+    <form id="editGroupForm">
+        <!-- Students Dropdown -->
+        <div class="form-group mb-3">
+            <label for="studentDropdown">Students</label>
+            <select class="form-control" id="studentDropdown">
+                <!-- Options will be added by JavaScript -->
+            </select>
+        </div>
+        <input type="hidden" id="groupId" value=""/>
+        <input type="hidden" id="courseCycleId" value=""/>
+        <button type="button" class="btn btn-primary mb-3" id="addStudentButton">Add</button>
+
+    <!-- Students Table -->
+    <table class="table mb-3" id="studentsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be added by JavaScript -->
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-success w-100" id="saveGroupButton">Save Group</button>
+    </form>
+</div>

@@ -14,7 +14,7 @@ namespace CanvasLMS.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Group> GetByIdAsync(int id, int courseCycleId)
+        public async Task<Group> GetByIdAsync(int? id, int courseCycleId)
         {
             return await _dbContext.Groups
                 .Include(g => g.CourseCycle)
@@ -26,7 +26,6 @@ namespace CanvasLMS.Repositories
         {
             return await _dbContext.Groups
                 .Where(g => g.CourseCycleId == courseCycleId)
-                .Include(g => g.CourseCycle)
                 .Include(g => g.Students)
                 .ToListAsync();
         }
@@ -81,7 +80,7 @@ namespace CanvasLMS.Repositories
             }
         }
         //Function to add a Student to a Group 
-        public async Task<(bool Success, string Message)> AddStudentToGroupAsync(int groupId, int courseCycleId, int studentId)
+        public async Task<(bool Success, string Message)> AddStudentToGroupAsync(int? groupId, int courseCycleId, int studentId)
         {
             try
             {

@@ -113,6 +113,12 @@
             case "evaluationDeleted":
                 displayToast("Evaluation Item deleted successfully.", "success")
                 break;
+            case "groupUpdated":
+                displayToast("Group updated successfully.", "success")
+                break;
+            case "groupDeleted":
+                displayToast("Group deleted successfully.", "success")
+                break;
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)

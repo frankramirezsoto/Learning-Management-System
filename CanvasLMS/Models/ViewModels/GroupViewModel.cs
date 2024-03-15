@@ -9,5 +9,6 @@ namespace CanvasLMS.Models.ViewModels
 
         public CourseCycle? CourseCycle { get; set; }
         public List<Student>? Students { get; set; }
+        public List<int>? StudentIds { get; set; }
     }
 }
