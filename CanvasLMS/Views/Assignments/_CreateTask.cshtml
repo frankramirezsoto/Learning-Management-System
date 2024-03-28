@@ -1,0 +1,61 @@
+﻿@using CanvasLMS.Models.ViewModels
+@model EvaluationTaskViewModel
+@{
+    var items = ViewData["EvaluationItems"] as List<EvaluationItemViewModel>;
+}
+
+<div class="p-3">
+    <div class="text-center mb-3">
+        <h4>Create a New Assignment</h4>
+    </div>
+    <form id="createTaskForm" asp-action="CreateTask" method="post">
+
+        <div class="row">
+            
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label for="EvaluationItemId" class="control-label mb-3">Evaluation Item</label>
+                    <select id="EvaluationItemId" name="EvaluationItemId" class="form-control">
+                        @foreach (var item in items)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label asp-for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" required/>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label asp-for="Description"></label>
+                    <textarea asp-for="Description" class="form-control" required></textarea>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label asp-for="Points"></label>
+                    <input asp-for="Points" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group mb-3">
+                    <label asp-for="Expires">Expiration Date</label>
+                    <input asp-for="Expires" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create Assignment</button>
+            </div>
+        </div>
+
+   </form>
+</div>

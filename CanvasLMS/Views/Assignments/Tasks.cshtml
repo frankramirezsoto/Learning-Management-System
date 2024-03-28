@@ -1,0 +1,426 @@
+﻿@using CanvasLMS.Models.ViewModels
+@using CanvasLMS.Models.Entities
+@using Newtonsoft.Json
+@model List<EvaluationItemViewModel> 
+
+@{
+    ViewData["Title"] = "Assigments";
+    var professor = ViewBag.Professor;
+    var student = ViewBag.Student;
+    //Model sent as ViewData to be used by the Partial View CreateTask, this will be used to create a Select List for the Evaluation Item 
+    ViewData["EvaluationItems"] = Model;
+    //Logic to determine if the tasks to be shown to the student are pending, submitted or scored
+    List<EvaluationTask> pendingTasks = new List<EvaluationTask>();
+    List<EvaluationTask> submittedTasks = new List<EvaluationTask>();
+    List<EvaluationTask> scoredTasks = new List<EvaluationTask>();
+    
+    if (student != null && Model != null)
+    {
+        foreach (var item in Model)
+        {
+            if (item.Tasks != null)
+            {
+                foreach (var task in item.Tasks)
+                {
+                    if (task.Submissions != null)
+                    {
+                        var submitted = false;
+                        foreach (var submission in task.Submissions)
+                        {
+                            if(submission.StudentId == student.UserId)
+                            {
+                                submitted = true;
+                                if (submission.Score == null)
+                                {
+                                    submittedTasks.Add(task);
+                                }
+                                else
+                                {
+                                    scoredTasks.Add(task);
+                                }
+                            }    
+                        }
+                        if (!submitted)
+                        {
+                            pendingTasks.Add(task);    
+                        }
+                    }    
+                }
+            }
+        }
+    }
+
+    //Settings used when serializing the model into a Json, this is used to update the edit modal based on the selected edit button
+    var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // or ReferenceLoopHandling.Serialize
+                MaxDepth = 32, // set your desired maximum depth
+            };
+}
+
+@if(professor != null)
+{
+    <!-- Modal for creating an Evaluation Task-->
+    <div class="modal fade" id="addTask" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @await Html.PartialAsync("_CreateTask", new CanvasLMS.Models.ViewModels.EvaluationTaskViewModel(), ViewData)
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for updating an Evaluation Task-->
+    <div class="modal fade" id="updateTask" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="p-3">
+                        <div class="text-center mb-3">
+                            <h4>Update Assignment</h4>
+                        </div>
+                        <form id="updateTaskForm" method="post">
+                            @* Hidden fields for the model *@
+                            <input type="hidden" name="IdUpdate" id="IdUpdate" />
+
+                            <div class="row">
+
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="NameUpdate">Name</label>
+                                        <input id="NameUpdate" name="NameUpdate" class="form-control" required />
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="DescriptionUpdate">Description</label>
+                                        <textarea id="DescriptionUpdate" name="DescriptionUpdate" class="form-control" required></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="PointsUpdate">Points</label>
+                                        <input id="PointsUpdate" name="PointsUpdate" class="form-control" required />
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="ExpiresUpdate">Expiration Date</label>
+                                        <input type="datetime-local" id="ExpiresUpdate" name="ExpiresUpdate" class="form-control" required />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Update Assignment</button>
+                                </div>
+                            </div>
+
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for Delete Confirmation -->
+    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Enrollment</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this task?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">I'm Sure</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<div class="col mx-3 row">
+
+    <div class="col-9">
+        <h2>Tasks</h2>
+    </div>
+    @* Add Button *@
+    @if (professor != null && Model.Count() >= 1)
+    {
+        <div class="col-3 d-flex justify-content-end mb-3">
+            <div>
+                <a data-bs-toggle="modal" data-bs-target="#addTask" class="icon icon-fill rounded d-flex align-items-center justify-content-center"><i class='bx bx-plus fs-1 my-auto' style="color:#b44fd1"></i></a>
+            </div>
+        </div>
+    }
+    @if (Model.Count() < 1)
+    {
+        <div class="text-center d-flex justify-content-center align-items-center" style="min-height:500px">
+            <div class="d-flex flex-column justify-content-center">
+                <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
+                <p>No Evaluation Items have been added</p>
+            </div>
+        </div>
+    } else
+    {
+        if(professor != null)
+        {
+            foreach (var item in Model)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5>@item.Name</h5>
+                    </div>
+                    @if (item.Tasks.Count() >= 1)
+                    {
+                        foreach (var task in item.Tasks)
+                        {
+                            <a href="#">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div>
+                                            <h6>@task.Name</h6>
+                                            <p>Points: @task.Points</p>
+                                            <p>Published: @task.Published</p>
+                                            <p>Expires: @task.Expires</p>
+                                            <div>
+                                                <button class="btn btn-primary me-3" onclick="populateUpdateTaskFormAndShowModal(@task.Id)"><i class='bx bxs-edit-alt text-white'></i></button>
+                                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                        data-evaluation-task-id="@task.Id">
+                                                    <i class='bx bxs-trash'></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            @* Arrow icon goes here *@
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        }    
+                    } 
+                    else
+                    {
+                        <div class="d-flex flex-column justify-content-center">
+                            <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
+                            <p>No Tasks have been added</p>
+                        </div>
+                    }
+                </div>
+            }        
+        } 
+        else if (student != null)
+        {
+            if(pendingTasks.Count() >= 1)
+            {
+                <h5>Pending Tasks</h5>
+                foreach (var task in pendingTasks)
+                {
+                    <a href="#">
+                        <div class="card">
+                            <div class="card-body">
+                                <div>
+                                    <h6>@task.Name</h6>
+                                    <p>Points: @task.Points</p>
+                                    <p>Published: @task.Published</p>
+                                    <p>Expires: @task.Expires</p>
+                                </div>
+                                <div>
+                                    @* Arrow icon goes here *@
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            if (submittedTasks.Count() >= 1)
+            {
+                <h5>Submitted Tasks</h5>
+                foreach (var task in submittedTasks)
+                {
+                    <a href="#">
+                        <div class="card">
+                            <div class="card-body">
+                                <div>
+                                    <h6>@task.Name</h6>
+                                    <p>Points: @task.Points</p>
+                                    <p>Published: @task.Published</p>
+                                    <p>Expires: @task.Expires</p>
+                                </div>
+                                <div>
+                                    @* Arrow icon goes here *@
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            if (scoredTasks.Count() >= 1)
+            {
+                <h5>Scored Tasks</h5>
+                foreach (var task in scoredTasks)
+                {
+                    <a href="#">
+                        <div class="card">
+                            <div class="card-body">
+                                <div>
+                                    <h6>@task.Name</h6>
+                                    <p>Points: @task.Points</p>
+                                    <p>Published: @task.Published</p>
+                                    <p>Expires: @task.Expires</p>
+                                </div>
+                                <div>
+                                    @* Arrow icon goes here *@
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            //Function to post the Task
+            $('#createTaskForm').submit(function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var formData = $(this).serialize(); // Serialize the form data
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Assignments/CreateTask',
+                    data: formData,
+                    success: function (response) {
+                        if (response === '200') {
+                            window.location.href = window.location.href.includes('?')
+                                ? window.location.href + '&showToast=taskAdded'
+                                : window.location.href + '?showToast=taskAdded';
+                        } else {
+                            displayToast(response, 'danger');
+                        }
+                    },
+                    error: function () {
+                        displayToast('Error occurred during the request.', 'danger');
+                    }
+                });
+            });
+
+            //Function to update the Task
+            $('#updateTaskForm').submit(function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var formData = $(this).serializeArray(); // Serialize the form data as an array
+
+                // Remove "Update" from each property name
+                formData = formData.map(function (item) {
+                    item.name = item.name.replace(/Update$/, ''); // Remove "Update" from the end of the name
+                    return item;
+                });
+
+                // Convert the modified array back to a serialized string
+                formData = $.param(formData);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Assignments/UpdateTask', // Adjust the URL to match your route
+                    data: formData,
+                    success: function (response) {
+                        if (response === '200') {
+                            //Handle success
+                            window.location.href = window.location.href.includes('?')
+                                ? window.location.href.replace('#','') + '&showToast=taskUpdated'
+                                : window.location.href.replace('#','') + '?showToast=taskUpdated';
+                        } else {
+                            // Handle error
+                            displayToast(response, 'danger');
+                        }
+                    },
+                    error: function () {
+                        // Handle error
+                        displayToast('Error occurred during the request.', 'danger');
+                    }
+                });
+            });
+
+            //Function to delete Student enrollment
+            $('#deleteModal').on('show.bs.modal', function (e) {
+                var evaluationTaskId = $(e.relatedTarget).data('evaluation-task-id');
+
+                $('#confirmDelete').click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Assignments/DeleteTask',
+                        data: { evaluationTaskId: evaluationTaskId },
+                        success: function (response) {
+                            if (response === '200') {
+                                //Handle success
+                                window.location.href = window.location.href.includes('?')
+                                    ? window.location.href.replace('#', '') + '&showToast=taskDeleted'
+                                    : window.location.href.replace('#', '') + '?showToast=taskDeleted';
+                            } else {
+                                displayToast(response, "danger");
+                            }
+                        }
+                    });
+                });
+            });
+        });
+
+        // Function to populate update task form and show the modal
+        function populateUpdateTaskFormAndShowModal(taskId) {
+            // Retrieve the serialized model from Razor
+            var evaluationItemModel = @Html.Raw(JsonConvert.SerializeObject(Model, settings));
+
+            // Variable to hold the task data
+            var taskData = null;
+            var taskFound = false; // Flag to track whether the task has been found
+
+            // Iterate through each item in evaluationItemModel
+            evaluationItemModel.forEach(function (item) {
+                // Check if the item has Tasks
+                if (item.Tasks && !taskFound) { // Only iterate if the task is not found
+                    // Use find method to search for the task with the given taskId
+                    taskData = item.Tasks.find(task => task.Id === taskId);
+                    // If taskData is found, set taskFound flag to true and exit the loop
+                    if (taskData) {
+                        taskFound = true;
+                        return;
+                    }
+                }
+            });
+
+            // Check if the task was found
+            if (!taskData) {
+                return;
+            }
+
+            // Populate the form fields with the retrieved task data
+            $("#IdUpdate").val(taskData.Id);
+            $("#NameUpdate").val(taskData.Name);
+            $("#DescriptionUpdate").val(taskData.Description);
+            $("#PointsUpdate").val(taskData.Points);
+            $("#ExpiresUpdate").val(taskData.Expires);
+
+            // Show the Bootstrap modal
+            $("#updateTask").modal('show');
+        }
+    </script>
+}
+

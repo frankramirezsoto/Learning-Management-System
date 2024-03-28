@@ -119,6 +119,15 @@
             case "groupDeleted":
                 displayToast("Group deleted successfully.", "success")
                 break;
+            case "taskAdded":
+                displayToast("Assignment added successfully.", "success")
+                break;
+            case "taskUpdated":
+                displayToast("Assignment updated successfully.", "success")
+                break;
+            case "taskDeleted":
+                displayToast("Assignment deleted successfully.", "success")
+                break;
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
