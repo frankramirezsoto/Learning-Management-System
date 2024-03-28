@@ -1,19 +1,19 @@
 ﻿@using CanvasLMS.Models.ViewModels
 @using CanvasLMS.Models.Entities
 @using Newtonsoft.Json
-@model List<EvaluationItemViewModel> 
+@model List<EvaluationItemViewModel>
 
 @{
     ViewData["Title"] = "Assigments";
     var professor = ViewBag.Professor;
     var student = ViewBag.Student;
-    //Model sent as ViewData to be used by the Partial View CreateTask, this will be used to create a Select List for the Evaluation Item 
+    //Model sent as ViewData to be used by the Partial View CreateTask, this will be used to create a Select List for the Evaluation Item
     ViewData["EvaluationItems"] = Model;
     //Logic to determine if the tasks to be shown to the student are pending, submitted or scored
     List<EvaluationTask> pendingTasks = new List<EvaluationTask>();
     List<EvaluationTask> submittedTasks = new List<EvaluationTask>();
     List<EvaluationTask> scoredTasks = new List<EvaluationTask>();
-    
+
     if (student != null && Model != null)
     {
         foreach (var item in Model)
@@ -27,7 +27,7 @@
                         var submitted = false;
                         foreach (var submission in task.Submissions)
                         {
-                            if(submission.StudentId == student.UserId)
+                            if (submission.StudentId == student.UserId)
                             {
                                 submitted = true;
                                 if (submission.Score == null)
@@ -38,13 +38,13 @@
                                 {
                                     scoredTasks.Add(task);
                                 }
-                            }    
+                            }
                         }
                         if (!submitted)
                         {
-                            pendingTasks.Add(task);    
+                            pendingTasks.Add(task);
                         }
-                    }    
+                    }
                 }
             }
         }
@@ -57,8 +57,12 @@
                 MaxDepth = 32, // set your desired maximum depth
             };
 }
-
-@if(professor != null)
+<style>
+    .card-hover:hover {
+        background-color: #dddae3;
+    }
+</style>
+@if (professor != null)
 {
     <!-- Modal for creating an Evaluation Task-->
     <div class="modal fade" id="addTask" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -125,7 +129,7 @@
                             </div>
 
                         </form>
-                        
+
                     </div>
                 </div>
             </div>
@@ -152,146 +156,162 @@
         </div>
     </div>
 }
-<div class="col mx-3 row">
+<div class="row">
 
-    <div class="col-9">
-        <h2>Tasks</h2>
-    </div>
-    @* Add Button *@
-    @if (professor != null && Model.Count() >= 1)
-    {
-        <div class="col-3 d-flex justify-content-end mb-3">
-            <div>
-                <a data-bs-toggle="modal" data-bs-target="#addTask" class="icon icon-fill rounded d-flex align-items-center justify-content-center"><i class='bx bx-plus fs-1 my-auto' style="color:#b44fd1"></i></a>
-            </div>
-        </div>
-    }
-    @if (Model.Count() < 1)
-    {
-        <div class="text-center d-flex justify-content-center align-items-center" style="min-height:500px">
-            <div class="d-flex flex-column justify-content-center">
-                <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
-                <p>No Evaluation Items have been added</p>
-            </div>
-        </div>
-    } else
-    {
-        if(professor != null)
+    @await Html.PartialAsync("_Banner", ViewData)
+
+    <div class="col-12 col-lg-1 d-flex justify-content-center align-items-start">
+        @if (student != null)
         {
-            foreach (var item in Model)
+            @await Html.PartialAsync("_NavBarStudent")
+        }
+        else if (professor != null)
+        {
+            @await Html.PartialAsync("_NavBarProfessor")
+        }
+    </div>
+
+    <div class="col mx-3 row">
+
+        <div class="col-9 d-flex align-items-center">
+            <h2>Assignments</h2>
+        </div>
+        @* Add Button *@
+        @if (professor != null && Model.Count() >= 1)
+        {
+            <div class="col-3 d-flex justify-content-end mb-3">
+                <div>
+                    <a data-bs-toggle="modal" data-bs-target="#addTask" class="icon icon-fill rounded d-flex align-items-center justify-content-center"><i class='bx bx-plus fs-1 my-auto' style="color:#b44fd1"></i></a>
+                </div>
+            </div>
+        }
+        @if (Model.Count() < 1)
+        {
+            <div class="text-center d-flex justify-content-center align-items-center" style="min-height:500px">
+                <div class="d-flex flex-column justify-content-center">
+                    <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
+                    <p class="text-center">No Evaluation Items have been added</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            if (professor != null)
             {
-                <div class="card">
-                    <div class="card-body">
-                        <h5>@item.Name</h5>
-                    </div>
-                    @if (item.Tasks.Count() >= 1)
-                    {
-                        foreach (var task in item.Tasks)
-                        {
-                            <a href="#">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div>
-                                            <h6>@task.Name</h6>
-                                            <p>Points: @task.Points</p>
-                                            <p>Published: @task.Published</p>
-                                            <p>Expires: @task.Expires</p>
-                                            <div>
-                                                <button class="btn btn-primary me-3" onclick="populateUpdateTaskFormAndShowModal(@task.Id)"><i class='bx bxs-edit-alt text-white'></i></button>
-                                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                        data-evaluation-task-id="@task.Id">
-                                                    <i class='bx bxs-trash'></i>
-                                                </button>
+                foreach (var item in Model)
+                {
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3">@item.Name</h5>
+                            @if (item.Tasks.Count() >= 1)
+                            {
+                                foreach (var task in item.Tasks)
+                                {
+                                    <a href="#">
+                                        <div class="card card-hover mb-3">
+                                            <div class="card-body row">
+                                                <div class="col-9">
+                                                    <h6 class="fw-bold">@task.Name</h6>
+                                                    <p class="mb-0">Points: @task.Points</p>
+                                                    <p class="mb-0">Published: @task.Published</p>
+                                                    <p class="mb-0">Expires: @task.Expires</p>
+                                                </div>
+                                                <div class="col-3">
+                                                    <div>
+                                                        <button class="btn btn-primary me-3 mb-3 mb-lg-0" onclick="populateUpdateTaskFormAndShowModal(@task.Id)"><i class='bx bxs-edit-alt text-white'></i></button>
+                                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                                data-evaluation-task-id="@task.Id">
+                                                            <i class='bx bxs-trash'></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div>
-                                            @* Arrow icon goes here *@
-                                        </div>
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <div class="d-flex flex-column justify-content-center">
+                                    <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
+                                    <p>No Tasks have been added</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else if (student != null)
+            {
+                if (pendingTasks.Count() >= 1)
+                {
+                    <h5 class="text-center mb-3">Pending Tasks</h5>
+                    foreach (var task in pendingTasks)
+                    {
+                        <a href="#">
+                            <div class="card card-hover mb-3">
+                                <div class="card-body row">
+                                    <div class="col-10">
+                                        <h6 class="fw-bold">@task.Name - @task.EvaluationItem.Name</h6>
+                                        <p class="mb-0">Points: @task.Points</p>
+                                        <p class="mb-0">Published: @task.Published</p>
+                                        <p class="mb-0">Expires: @task.Expires</p>
+                                    </div>
+                                    <div class="col-2 d-flex justify-content-end align-items-center">
+                                        <i class='bx bx-chevron-right fs-1'></i>
                                     </div>
                                 </div>
-                            </a>
-                        }    
-                    } 
-                    else
-                    {
-                        <div class="d-flex flex-column justify-content-center">
-                            <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
-                            <p>No Tasks have been added</p>
-                        </div>
+                            </div>
+                        </a>
                     }
-                </div>
-            }        
-        } 
-        else if (student != null)
-        {
-            if(pendingTasks.Count() >= 1)
-            {
-                <h5>Pending Tasks</h5>
-                foreach (var task in pendingTasks)
-                {
-                    <a href="#">
-                        <div class="card">
-                            <div class="card-body">
-                                <div>
-                                    <h6>@task.Name</h6>
-                                    <p>Points: @task.Points</p>
-                                    <p>Published: @task.Published</p>
-                                    <p>Expires: @task.Expires</p>
-                                </div>
-                                <div>
-                                    @* Arrow icon goes here *@
-                                </div>
-                            </div>
-                        </div>
-                    </a>
                 }
-            }
-            if (submittedTasks.Count() >= 1)
-            {
-                <h5>Submitted Tasks</h5>
-                foreach (var task in submittedTasks)
+                if (submittedTasks.Count() >= 1)
                 {
-                    <a href="#">
-                        <div class="card">
-                            <div class="card-body">
-                                <div>
-                                    <h6>@task.Name</h6>
-                                    <p>Points: @task.Points</p>
-                                    <p>Published: @task.Published</p>
-                                    <p>Expires: @task.Expires</p>
-                                </div>
-                                <div>
-                                    @* Arrow icon goes here *@
+                    <h5 class="text-center mb-3">Submitted Tasks</h5>
+                    foreach (var task in submittedTasks)
+                    {
+                        <a href="#">
+                            <div class="card card-hover mb-3">
+                                <div class="card-body">
+                                    <div>
+                                        <h6 class="fw-bold">@task.Name - @task.EvaluationItem.Name</h6>
+                                        <p class="mb-0">Points: @task.Points</p>
+                                        <p class="mb-0">Published: @task.Published</p>
+                                        <p class="mb-0">Expires: @task.Expires</p>
+                                    </div>
+                                    <div>
+                                        @* Arrow icon goes here *@
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    }
                 }
-            }
-            if (scoredTasks.Count() >= 1)
-            {
-                <h5>Scored Tasks</h5>
-                foreach (var task in scoredTasks)
+                if (scoredTasks.Count() >= 1)
                 {
-                    <a href="#">
-                        <div class="card">
-                            <div class="card-body">
-                                <div>
-                                    <h6>@task.Name</h6>
-                                    <p>Points: @task.Points</p>
-                                    <p>Published: @task.Published</p>
-                                    <p>Expires: @task.Expires</p>
-                                </div>
-                                <div>
-                                    @* Arrow icon goes here *@
+                    <h5 class="text-center mb-3">Graded Tasks</h5>
+                    foreach (var task in scoredTasks)
+                    {
+                        <a href="#">
+                            <div class="card card-hover mb-3">
+                                <div class="card-body">
+                                    <div>
+                                        <h6 class="fw-bold">@task.Name - @task.EvaluationItem.Name</h6>
+                                        <p class="mb-0">Points: @task.Points</p>
+                                        <p class="mb-0">Published: @task.Published</p>
+                                        <p class="mb-0">Expires: @task.Expires</p>
+                                    </div>
+                                    <div>
+                                        @* Arrow icon goes here *@
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    }
                 }
             }
         }
-    }
+    </div>
 </div>
 
 @section Scripts {
@@ -345,8 +365,8 @@
                         if (response === '200') {
                             //Handle success
                             window.location.href = window.location.href.includes('?')
-                                ? window.location.href.replace('#','') + '&showToast=taskUpdated'
-                                : window.location.href.replace('#','') + '?showToast=taskUpdated';
+                                ? window.location.href.replace('#', '') + '&showToast=taskUpdated'
+                                : window.location.href.replace('#', '') + '?showToast=taskUpdated';
                         } else {
                             // Handle error
                             displayToast(response, 'danger');
