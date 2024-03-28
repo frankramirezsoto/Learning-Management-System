@@ -272,15 +272,15 @@
                     {
                         <a href="#">
                             <div class="card card-hover mb-3">
-                                <div class="card-body">
-                                    <div>
+                                <div class="card-body row">
+                                    <div class="col-10">
                                         <h6 class="fw-bold">@task.Name - @task.EvaluationItem.Name</h6>
                                         <p class="mb-0">Points: @task.Points</p>
                                         <p class="mb-0">Published: @task.Published</p>
                                         <p class="mb-0">Expires: @task.Expires</p>
                                     </div>
-                                    <div>
-                                        @* Arrow icon goes here *@
+                                    <div class="col-2 d-flex justify-content-end align-items-center">
+                                        <i class='bx bx-chevron-right fs-1'></i>
                                     </div>
                                 </div>
                             </div>
@@ -289,20 +289,21 @@
                 }
                 if (scoredTasks.Count() >= 1)
                 {
+
                     <h5 class="text-center mb-3">Graded Tasks</h5>
                     foreach (var task in scoredTasks)
                     {
                         <a href="#">
                             <div class="card card-hover mb-3">
-                                <div class="card-body">
-                                    <div>
+                                <div class="card-body row">
+                                    <div class="col-10">
                                         <h6 class="fw-bold">@task.Name - @task.EvaluationItem.Name</h6>
                                         <p class="mb-0">Points: @task.Points</p>
                                         <p class="mb-0">Published: @task.Published</p>
-                                        <p class="mb-0">Expires: @task.Expires</p>
+                                        <p class="mb-0">Expiration: @task.Expires</p>
                                     </div>
-                                    <div>
-                                        @* Arrow icon goes here *@
+                                    <div class="col-2 d-flex justify-content-end align-items-center">
+                                        <i class='bx bx-chevron-right fs-1'></i>
                                     </div>
                                 </div>
                             </div>

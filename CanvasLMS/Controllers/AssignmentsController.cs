@@ -26,15 +26,15 @@ namespace CanvasLMS.Controllers
             //Gets the session to be passed to the View and handle the permissions on this view
             var professorSession = HttpContext.Session.GetObject<SessionViewModel>("Professor");
             var studentSession = HttpContext.Session.GetObject<SessionViewModel>("Student");
-            //if (studentSession != null)
-            //{
-            //    //Checks with the parent Controller function that the Student is part of the screen being requested 
-            //    var studentIsInCourse = await StudentIsInCourse(id);
-            //    if (!studentIsInCourse)
-            //    {
-            //        return RedirectToAction("NotAuthorized", "Home");
-            //    }
-            //}
+            if (studentSession != null)
+            {
+                //Checks with the parent Controller function that the Student is part of the screen being requested 
+                var studentIsInCourse = await StudentIsInCourse(id);
+                if (!studentIsInCourse)
+                {
+                    return RedirectToAction("NotAuthorized", "Home");
+                }
+            }
 
             ViewBag.Professor = professorSession;
             ViewBag.Student = studentSession;
@@ -45,12 +45,6 @@ namespace CanvasLMS.Controllers
             var courseCycle = await _courseCycleRepository.GetByIdAsync(id);
             ViewData["CourseColor"] = courseCycle.Color;
             ViewData["CourseName"] = courseCycle.Course.Name;
-
-            //Get the groups per CourseCycle to be passed to the View as ViewData
-            var groups = await _groupRepository.GetAllByCourseCycleIdAsync(id);
-            var groupsViewModel = new List<GroupViewModel>();
-            ObjectMapper.MapProperties(groups, groupsViewModel);
-            ViewData["Groups"] = groups;
 
             //Gets the evaluationItems for the courseCycleId - The evaluation item themselves contain their associated tasks
             var evaluationItems = await _evaluationItemRepository.GetAllByCourseCycleIdAsync(id);
@@ -117,6 +111,44 @@ namespace CanvasLMS.Controllers
                 }
             }
             return Content("Unable to remove student enrollment. Please try again.");
+        }
+
+        //-------------------------------------------------------------------------------------------------
+        //Task View
+
+        [HttpPost]
+        public async Task<IActionResult> Task(int id) 
+        {
+            //Gets the session to be passed to the View and handle the permissions on this view
+            var professorSession = HttpContext.Session.GetObject<SessionViewModel>("Professor");
+            var studentSession = HttpContext.Session.GetObject<SessionViewModel>("Student");
+            if (studentSession != null)
+            {
+                //Checks with the parent Controller function that the Student is part of the screen being requested 
+                var studentIsInCourse = await StudentIsInCourse(id);
+                if (!studentIsInCourse)
+                {
+                    return RedirectToAction("NotAuthorized", "Home");
+                }
+            }
+
+            ViewBag.Professor = professorSession;
+            ViewBag.Student = studentSession;
+            //Passes course cycle id to be used when adding the evaluation
+            ViewData["CourseCycleId"] = id;
+
+            //Gets the CourseCycle to pass ViewData to be used by the banner 
+            var courseCycle = await _courseCycleRepository.GetByIdAsync(id);
+            ViewData["CourseColor"] = courseCycle.Color;
+            ViewData["CourseName"] = courseCycle.Course.Name;
+
+            //Gets the task by its id
+            var evaluationTask = await _evaluationTaskRepository.GetByIdAsync(id);
+            //Converts task into TaskViewModel
+            var taskViewModel = new EvaluationTaskViewModel();
+            ObjectMapper.MapProperties(evaluationTask, taskViewModel);
+
+            return View(taskViewModel);
         }
     }
 }
