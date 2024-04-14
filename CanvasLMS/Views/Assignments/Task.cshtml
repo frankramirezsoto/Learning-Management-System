@@ -84,7 +84,7 @@
                                 // Determine the color based on the percentage
                                 if (percentage <= 40)
                                 {
-                                    bgColor = "bg-danger";
+                                    bgColor = "bg-danger text-white";
                                 }
                                 else if (percentage > 40 && percentage <= 69)
                                 {
@@ -92,11 +92,11 @@
                                 }
                                 else if (percentage >= 70 && percentage <= 100)
                                 {
-                                    bgColor = "bg-success";
+                                    bgColor = "bg-success text-white";
                                 }
                                         <div>
                                             <h4 class="text-center fw-bold">Score</h4>
-                                            <div class="@bgColor rounded-pill p-3">
+                                    <div class="@bgColor rounded-pill p-3">
                                                 <span class="fs-3">@submission.Score /</span>
                                                 <span class="fs-4">@Model.Points</span>
                                             </div>
@@ -107,7 +107,7 @@
                                 studentSubmittedTask = true;
                                         <div>
                                             <h4 class="text-center fw-bold">Score</h4>
-                                            <div class="bg-primary rounded-pill p-3">
+                                            <div class="bg-primary text-white rounded-pill p-3">
                                                 <span class="fs-3"> --.-- /</span>
                                                 <span class="fs-4">@Model.Points</span>
                                             </div>
@@ -116,7 +116,7 @@
                             }
                         }
                     }
-                    else if (!studentSubmittedTask && student != null)
+                    if (!studentSubmittedTask && student != null)
                     {
                                 <div>
                                     <h4 class="text-center fw-bold">Score</h4>
@@ -127,7 +127,7 @@
                                     <p class="fw-bold text-center mt-2" style="color:gray">Not yet submitted</p>
                                 </div>
                     }
-                    else
+                    else if(professor != null)
                     {
                                 <div>
                                     <h4 class="text-center fw-bold">Score</h4>
@@ -289,11 +289,11 @@
                                                     <span class="input-group-text">Score:</span>
                                                     @if (taskScored)
                                                     {
-                                                        <input value="@score" type="number" class="form-control" placeholder="up to @Model.Points pts" aria-label="Score" id="Score_@submissionId" name="Score">
+                                                        <input value="@score" type="number" class="form-control" placeholder="Enter Score here" aria-label="Score" id="Score_@submissionId" name="Score">
                                                     } else
                                                     {
 
-                                                        <input id="Score_@submissionId" type="number" class="form-control" placeholder="up to @Model.Points pts" aria-label="Score" name="Score">
+                                                        <input id="Score_@submissionId" type="number" class="form-control" placeholder="Enter Score here" aria-label="Score" name="Score">
                                                     }
                                                 </div>
                                                 <button class="btn btn-primary update-score-btn" type="button" data-submission-id="@submissionId">Update Score</button>
@@ -319,7 +319,7 @@
                                                 <div class="input-group me-3">
                                                     <input type="number"
                                                            class="form-control me-3 score-input"
-                                                           placeholder="up to @Model.Points pts"
+                                                           placeholder="Enter Score here"
                                                            aria-label="Score"
                                                            id="Score_@submission.Id"
                                                            name="Score"
