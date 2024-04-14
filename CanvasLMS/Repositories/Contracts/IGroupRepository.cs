@@ -11,5 +11,6 @@ namespace CanvasLMS.Repositories.Contracts
         Task<(bool Success, string Message)> DeleteAsync(int id, int courseCycleId);
         Task<(bool Success, string Message)> AddStudentToGroupAsync(int? groupId, int courseCycleId, int studentId);
         Task<(bool Success, string Message)> RemoveStudentFromGroupAsync(int groupId, int courseCycleId, int studentId);
+        Task<Group> GetGroupWhereStudentIdAsync(int studentId, int courseCycleId);
     }
 }

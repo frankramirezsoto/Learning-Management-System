@@ -128,8 +128,16 @@
             case "taskDeleted":
                 displayToast("Assignment deleted successfully.", "success")
                 break;
+            case "scoreUpdated":
+                displayToast("Score updated successfully.", "success")
+                break;
+            case "taskSubmitted":
+                displayToast("Task submitted successfully.", "success")
+                break;
         }
     </script>
+
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

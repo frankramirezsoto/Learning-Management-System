@@ -133,5 +133,12 @@ namespace CanvasLMS.Repositories
                 return (false, $"Failed to add to GroupStudent: {ex.Message}");
             }
         }
+
+        public async Task<Group> GetGroupWhereStudentIdAsync(int studentId, int courseCycleId)
+        {
+            return await _dbContext.Groups
+                .Include(g => g.Students) // Include related entities if needed
+                .FirstOrDefaultAsync(g => g.CourseCycleId == courseCycleId && g.Students.Any(s => s.Id == studentId));
+        }
     }
 }

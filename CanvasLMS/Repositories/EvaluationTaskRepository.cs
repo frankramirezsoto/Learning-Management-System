@@ -19,6 +19,7 @@ namespace CanvasLMS.Repositories
             return await _dbContext.EvaluationTasks
                 .Include(e => e.EvaluationItem)
                 .Include(e => e.Submissions)
+                    .ThenInclude(e => e.Student)
                 .FirstOrDefaultAsync(task => task.Id == id);
         }
 

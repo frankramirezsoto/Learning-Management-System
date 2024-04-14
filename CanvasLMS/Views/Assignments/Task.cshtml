@@ -1,4 +1,406 @@
-﻿@model CanvasLMS.Models.ViewModels.EvaluationTaskViewModel
+﻿@using CanvasLMS.Models.ViewModels
+@using CanvasLMS.Models.Entities
+@model EvaluationTaskViewModel
 @{
+    ViewData["Title"] = $"{Model.Name} - {Model.EvaluationItem.Name}";
+    var professor = ViewBag.Professor;
+    var student = ViewBag.Student;
+
+    var courseCycleId = ViewData["CourseCycleId"];
+    var groups = ViewData["Groups"] as List<Group>;
+
+}
+<!-- Modal for Upload Confirmation -->
+<div class="modal fade" id="uploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload Assignment Confirmation</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to send this submission?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="submitTaskBtn" class="btn btn-primary">I'm sure</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    @* Renders banner *@
+    @await Html.PartialAsync("_Banner", ViewData)
+    @* Renders side bar *@
+    <div class="col-12 col-lg-1 d-flex justify-content-center align-items-start">
+        @if (student != null)
+        {
+            @await Html.PartialAsync("_NavBarStudent")
+        }
+        else if (professor != null)
+        {
+            @await Html.PartialAsync("_NavBarProfessor")
+        }
+    </div>
+
+    <div class="col row">
+        @* Back arrow *@
+        <a href="@Url.Content($"~/Assignments/Tasks/{courseCycleId}")" class="py-3"><i class='bx bx-arrow-back fs-1'></i></a>
+        @* Task Container *@
+        <div class="col-12 py-3 px-5">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-3">@Model.Name - @Model.EvaluationItem.Name</h2>
+                    @* Based on the assignment it will add a badge for groupal or individual *@
+                    @{
+                        if (Model.EvaluationItem.IsGroupal)
+                        {
+                                    <div class="badge bg-danger mb-3" style="font-size:1.1rem">This assignment is evaluated in groups.</div>
+                        }
+                        else
+                        {
+                                    <div class="badge bg-info mb-3" style="font-size:1.1rem">This item is evaluated individually.</div>
+                        }
+                    }
+                </div>
+                @* Rendering study View for students to upload submissions *@
+                @{
+                    //Var to confirm if student submitted the task
+                    var studentSubmittedTask = false;
+                    if (student != null && Model.Submissions != null)
+                    {
+                        foreach (var submission in Model.Submissions)
+                        {
+                            if (submission.Score != null && student.UserId == submission.StudentId)
+                            {
+                                studentSubmittedTask = true;
+                                //Variable to store the background color
+                                var bgColor = "";
+                                // Calculate the percentage
+                                var percentage = (submission.Score / Model.Points) * 100;
+
+                                // Determine the color based on the percentage
+                                if (percentage <= 40)
+                                {
+                                    bgColor = "bg-danger";
+                                }
+                                else if (percentage > 40 && percentage <= 69)
+                                {
+                                    bgColor = "bg-warning";
+                                }
+                                else if (percentage >= 70 && percentage <= 100)
+                                {
+                                    bgColor = "bg-success";
+                                }
+                                        <div>
+                                            <h4 class="text-center fw-bold">Score</h4>
+                                            <div class="@bgColor rounded-pill p-3">
+                                                <span class="fs-3">@submission.Score /</span>
+                                                <span class="fs-4">@Model.Points</span>
+                                            </div>
+                                        </div>
+                            }
+                            else if (submission.Score == null && student.UserId == submission.StudentId)
+                            {
+                                studentSubmittedTask = true;
+                                        <div>
+                                            <h4 class="text-center fw-bold">Score</h4>
+                                            <div class="bg-primary rounded-pill p-3">
+                                                <span class="fs-3"> --.-- /</span>
+                                                <span class="fs-4">@Model.Points</span>
+                                            </div>
+                                            <p class="fw-bold text-center mt-2" style="color:gray">Not yet graded</p>
+                                        </div>
+                            }
+                        }
+                    }
+                    else if (!studentSubmittedTask && student != null)
+                    {
+                                <div>
+                                    <h4 class="text-center fw-bold">Score</h4>
+                                    <div class="bg-primary rounded-pill p-3 text-white">
+                                        <span class="fs-3"> --.--/</span>
+                                        <span class="fs-4">@Model.Points</span>
+                                    </div>
+                                    <p class="fw-bold text-center mt-2" style="color:gray">Not yet submitted</p>
+                                </div>
+                    }
+                    else
+                    {
+                                <div>
+                                    <h4 class="text-center fw-bold">Score</h4>
+                                    <div class="bg-primary rounded-pill p-3 text-white">
+                                        <span class="fs-4">@Model.Points</span>
+                                    </div>
+                                </div>
+                    }
+                }
+            </div>
+
+            <p class="fw-bold" style="color:gray">Published: @Model.Published</p>
+            @* Determines color of the expiration text, red if expired and green if not expired *@
+            @{
+                var expirationColor = "text-success";
+                if (Model.Expires < DateTime.Now) { expirationColor = "text-danger"; }
+            }
+            <p class="fw-bold @expirationColor" style="color:gray">Due date: @Model.Expires</p>
+
+            <h5 class="fw-bold">Assignment description:</h5>
+            <p>@Model.Description</p>
+
+            @if (student != null)
+            {
+                //Var to store if the submission was found for the student logged
+                var submissionFound = false;
+                if (Model.Submissions != null)
+                {
+                    foreach (var submission in Model.Submissions)
+                    {
+                        if (student.UserId == submission.StudentId)
+                        {
+                            submissionFound = true; //Submission was found
+                            <div style="border: 5px dotted #bd2c7a; padding:6rem;">
+                                <p class="text-center">Task submitted on @submission.SubmissionDate</p>
+                                <a href="@submission.FilePath" download>
+                                    <div class="border norder-1 py-3 d-flex justify-content-center">
+                                        <div>
+                                            <i class='bx bx-download text-success me-3 fs-1'></i>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <p class="fs-5 mb-0">
+                                                Download submission
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                }
+                if (!submissionFound)
+                {
+                    //First confirming if there's time to send a new submission or if the deadline expired
+                    if (Model.Expires > DateTime.Now)
+                    {
+                        <div style="border: 5px dotted #bd2c7a; padding:6rem;">
+                            <form id="uploadForm" action="/TaskSubmission/UploadAssignment" method="post" enctype="multipart/form-data">
+                                <input type="hidden" id="EvaluationTaskId" name="EvaluationTaskId" value="@Model.Id" />
+                                <input type="hidden" id="StudentId" name="StudentId" value="@student.UserId" />
+
+                                <div class="form-group">
+                                    <label for="fileUpload">Upload Assignment</label>
+                                    <p class="mb-1 text-danger">*You only have one attempt</p>
+                                    @if (Model.EvaluationItem.IsGroupal)
+                                    {
+                                        <p class="mb-0 text-danger">*Your submission will count for the entire group</p>
+                                    }
+                                    <input type="file" id="fileUpload" name="fileUpload" class="form-control mb-3" />
+                                </div>
+
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#uploadModal" class="btn btn-primary">Submit Assignment</button>
+                            </form>
+                        </div>
+                    } else
+                    {
+                        <div style="border: 5px dotted #bd2c7a; padding:6rem;">
+                            <div class="text-center d-flex justify-content-center align-items-center">
+                                <div class="d-flex flex-column justify-content-center">
+                                    <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
+                                    <p>The deadline for this task to be submitted has passed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            } 
+            @* Rendering study View for professor view to score the submission *@
+            @if(professor != null)
+            {
+                @if (Model.Submissions.Count() == 0)
+                {
+                    <div class="text-center d-flex justify-content-center align-items-center" style="min-height:200px">
+                        <div class="d-flex flex-column justify-content-center">
+                            <i class='text-center bx bxs-alarm-exclamation fs-1'></i>
+                            <p>No Submissions to evaluate yet.</p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        @* Logic if the submission is groupal *@
+                        @if (Model.EvaluationItem.IsGroupal && groups != null)
+                        {
+                            foreach (var group in groups)
+                            {
+                                //checks if task was submitted
+                                var groupSubmittedTask = false;
+                                var submissionId = 0;
+                                //will store the path of the file submitted
+                                var taskFilePath = "";
+                                //Checks if task has been scored to assign a value to the input field otherwise
+                                var taskScored = false;
+                                decimal? score = 0;
+                                foreach (var stud in group.Students)
+                                {
+                                    foreach (var submission in Model.Submissions)
+                                    {
+                                        //if student is found on the submission
+                                        if (stud.Id == submission.StudentId)
+                                        {
+                                            groupSubmittedTask = true;
+                                            submissionId = submission.Id;
+                                            taskFilePath = submission.FilePath;
+                                            taskScored = submission.Score != null;
+                                            if (taskScored) { score = submission.Score; };
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (groupSubmittedTask)
+                                {
+                                    <div class="card p-5 mb-3">
+                                        <h5>Group: @group.Id</h5>
+                                        <ul class="d-inline-flex ps-0" style="list-style:none">
+                                            @foreach (var stud in group.Students)
+                                            {
+                                                <li class="me-4">@stud.FirstName @stud.LastName </li>
+                                            }
+                                        </ul>
+
+                                        <div>
+                                            <a href="@taskFilePath" download>
+                                                <div class="border norder-1 py-3 d-flex justify-content-center mb-3">
+                                                    <div>
+                                                        <i class='bx bx-download text-success me-3 fs-1'></i>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="fs-5 mb-0">
+                                                            Download submission
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <form>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">Score:</span>
+                                                    @if (taskScored)
+                                                    {
+                                                        <input value="@score" type="number" class="form-control" placeholder="up to @Model.Points pts" aria-label="Score" id="Score_@submissionId" name="Score">
+                                                    } else
+                                                    {
+
+                                                        <input id="Score_@submissionId" type="number" class="form-control" placeholder="up to @Model.Points pts" aria-label="Score" name="Score">
+                                                    }
+                                                </div>
+                                                <button class="btn btn-primary update-score-btn" type="button" data-submission-id="@submissionId">Update Score</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                } 
+                            }
+                        }
+                        else
+                        {
+                            <div class="card p-5 mb-3">
+                                <h5 class="mb-3">Students:</h5>
+
+                                @foreach (var submission in Model.Submissions)
+                                {
+                                    <div class="card p-3">
+                                        <div class="row g-3">
+                                            <div class="col-4 d-flex align-items-center">
+                                                <p class="fs-5 mb-0"> @submission.Student.FirstName @submission.Student.LastName</p>
+                                            </div>
+                                            <div class="col-8 d-flex">
+                                                <div class="input-group me-3">
+                                                    <input type="number"
+                                                           class="form-control me-3 score-input"
+                                                           placeholder="up to @Model.Points pts"
+                                                           aria-label="Score"
+                                                           id="Score_@submission.Id"
+                                                           name="Score"
+                                                           value="@submission.Score">
+                                                    <span>
+                                                        <button class="btn btn-primary h-100 update-score-btn"
+                                                                type="button"
+                                                                data-submission-id="@submission.Id">
+                                                            Update Score
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                                <a class="btn btn-success" href="@submission.FilePath" download=""><i class='bx bx-download text-white p-2 fs-5'></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            //Function to submit Task
+            $("#submitTaskBtn").click(function () {
+
+                var formData = new FormData($("#uploadForm")[0]);
+
+                $.ajax({
+                    url: '@Url.Action("UploadAssignment", "Assignments")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // Handle success response
+                        window.location.href = "@Url.Content($"~/Assignments/Tasks/{courseCycleId}?showToast=taskSubmitted")"
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error response
+                        displayToast("Error uploading assignment:", error, "danger");
+                    }
+                });
+            });
+            //Function to update score 
+            $('.update-score-btn').click(function () {
+                var submissionId = $(this).data('submission-id');
+                var score = $('#Score_' + submissionId).val();
+                
+                if (score > @Model.Points) {
+                    displayToast('The score you are trying to place is higher that the score of the assignment', "danger");
+                } else 
+                {
+                    $.ajax({
+                        url: '@Url.Action("UpdateScore", "Assignments")',
+                        type: 'POST',
+                        data: { submissionId: submissionId, score: score },
+                        success: function (response) {
+                            if (response === "200") {
+                                //Handle success
+                                window.location.href = window.location.href.includes('?')
+                                    ? window.location.href.replace('#', '') + '&showToast=scoreUpdated'
+                                    : window.location.href.replace('#', '') + '?showToast=scoreUpdated';
+                            } else {
+                                displayToas('Error: ' + response, "danger");
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            displayToas('An error occurred: ' + error, "danger");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 
 }

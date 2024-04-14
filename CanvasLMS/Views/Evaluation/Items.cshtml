@@ -192,7 +192,7 @@
 
                                     }
                                     @* If there are tasks it will load another accordion *@
-                                    @if (evaluationItem.Tasks != null)
+                                    @* @if (evaluationItem.Tasks != null)
                                     {
                                         <div class="col-12 ">
                                             <div class="accordion" id="taskAccordion">
@@ -213,7 +213,7 @@
                                                                         <p class="fw-bold">Points: @task.Points pts</p>
                                                                         <p><b>Description:</b> @task.Description</p>
                                                                     </div>
-                                                                    @* If there are any submissions and the student is logged then it will show their current submission score *@
+                                                                    
                                                                     @if (student != null && task.Submissions.Any())
                                                                     {
                                                                         foreach (var submission in task.Submissions)
@@ -233,7 +233,7 @@
                                                                             }
                                                                         }
                                                                     }
-                                                                    @* Logic if the task is groupal as per the Evluation Item *@
+                                                                    
                                                                     @if (evaluationItem.IsGroupal && ViewBag.Professor != null)
                                                                     {
                                                                         @if (groups != null && task.Submissions.Count() > 0)
@@ -307,7 +307,7 @@
                                                 }
                                             </div>
                                         </div>
-                                    }
+                                    } *@
                                 </div>
                             </div>
                         </div>

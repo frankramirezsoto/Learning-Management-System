@@ -7,6 +7,8 @@
     ViewData["Title"] = "Assigments";
     var professor = ViewBag.Professor;
     var student = ViewBag.Student;
+    //CourseCycleid 
+    var courseCycleId=ViewData["CourseCycleId"];
     //Model sent as ViewData to be used by the Partial View CreateTask, this will be used to create a Select List for the Evaluation Item
     ViewData["EvaluationItems"] = Model;
     //Logic to determine if the tasks to be shown to the student are pending, submitted or scored
@@ -207,27 +209,26 @@
                             {
                                 foreach (var task in item.Tasks)
                                 {
-                                    <a href="#">
-                                        <div class="card card-hover mb-3">
-                                            <div class="card-body row">
-                                                <div class="col-9">
-                                                    <h6 class="fw-bold">@task.Name</h6>
-                                                    <p class="mb-0">Points: @task.Points</p>
-                                                    <p class="mb-0">Published: @task.Published</p>
-                                                    <p class="mb-0">Expires: @task.Expires</p>
-                                                </div>
-                                                <div class="col-3">
-                                                    <div>
-                                                        <button class="btn btn-primary me-3 mb-3 mb-lg-0" onclick="populateUpdateTaskFormAndShowModal(@task.Id)"><i class='bx bxs-edit-alt text-white'></i></button>
-                                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                                data-evaluation-task-id="@task.Id">
-                                                            <i class='bx bxs-trash'></i>
-                                                        </button>
-                                                    </div>
+                                    <div class="card card-hover mb-3">
+                                        <div class="card-body d-flex justify-content-between">
+                                            <a href="@Url.Content($"~/Assignments/Task?courseCycleId={courseCycleId}&taskId={task.Id}")" class="flex-grow-1">
+                                                <h6 class="fw-bold">@task.Name</h6>
+                                                <p class="mb-0">Points: @task.Points</p>
+                                                <p class="mb-0">Published: @task.Published</p>
+                                                <p class="mb-0">Expires: @task.Expires</p>
+                                            </a>
+                                            <div>
+                                                <div>
+                                                    <button class="btn btn-primary me-3 mb-3" onclick="populateUpdateTaskFormAndShowModal(@task.Id)"><i class='bx bxs-edit-alt text-white'></i></button>
+                                                    <button class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                            data-evaluation-task-id="@task.Id">
+                                                        <i class='bx bxs-trash'></i>
+                                                    </button>
+
                                                 </div>
                                             </div>
                                         </div>
-                                    </a>
+                                    </div>
                                 }
                             }
                             else
@@ -248,7 +249,7 @@
                     <h5 class="text-center mb-3">Pending Tasks</h5>
                     foreach (var task in pendingTasks)
                     {
-                        <a href="#">
+                        <a href="@Url.Content($"~/Assignments/Task?courseCycleId={courseCycleId}&taskId={task.Id}")">
                             <div class="card card-hover mb-3">
                                 <div class="card-body row">
                                     <div class="col-10">
@@ -270,7 +271,7 @@
                     <h5 class="text-center mb-3">Submitted Tasks</h5>
                     foreach (var task in submittedTasks)
                     {
-                        <a href="#">
+                        <a href="@Url.Content($"~/Assignments/Task?courseCycleId={courseCycleId}&taskId={task.Id}")">
                             <div class="card card-hover mb-3">
                                 <div class="card-body row">
                                     <div class="col-10">
@@ -293,7 +294,7 @@
                     <h5 class="text-center mb-3">Graded Tasks</h5>
                     foreach (var task in scoredTasks)
                     {
-                        <a href="#">
+                        <a href="@Url.Content($"~/Assignments/Task?courseCycleId={courseCycleId}&taskId={task.Id}")">
                             <div class="card card-hover mb-3">
                                 <div class="card-body row">
                                     <div class="col-10">
@@ -360,7 +361,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: '/Assignments/UpdateTask', // Adjust the URL to match your route
+                    url: '/Assignments/UpdateTask', 
                     data: formData,
                     success: function (response) {
                         if (response === '200') {

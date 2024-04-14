@@ -24,6 +24,7 @@ builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IEvaluationItemRepository, EvaluationItemRepository>();
 builder.Services.AddScoped<IEvaluationTaskRepository, EvaluationTaskRepository>();
+builder.Services.AddScoped<ITaskSubmissionRepository, TaskSubmissionRepository>();
 
 builder.Services.AddSession(options =>
 {
